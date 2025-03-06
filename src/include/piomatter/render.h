@@ -214,18 +214,18 @@ void protomatter_render_rgb10(std::vector<uint32_t> &result,
             auto mapiter = matrixmap.map.begin() + 2 * addr * pixels_across;
             for (size_t x = 0; x < pixels_across; x++) {
                 uint32_t data = addr_bits;
-                for(size_t px = 0; px < std::size(pinout::PIN_RGB) / 3; px++) {
+                for (size_t px = 0; px < matrixmap.n_lanes; px++) {
                     assert(mapiter != matrixmap.map.end());
                     auto pixel0 = pixels[*mapiter++];
                     auto r_bit = pixel0 & r_mask;
                     auto g_bit = pixel0 & g_mask;
                     auto b_bit = pixel0 & b_mask;
 
-                    if(r_bit)
+                    if (r_bit)
                         data |= (1 << pinout::PIN_RGB[px * 3 + 0]);
-                    if(g_bit)
+                    if (g_bit)
                         data |= (1 << pinout::PIN_RGB[px * 3 + 1]);
-                    if(b_bit)
+                    if (b_bit)
                         data |= (1 << pinout::PIN_RGB[px * 3 + 2]);
                 }
 

@@ -33,6 +33,14 @@ make_piomatter_pc(py::buffer buffer,
     const py::buffer_info info = buffer.request();
     const size_t buffer_size_in_bytes = info.size * info.itemsize;
 
+    if (geometry.n_lanes * 3 > std::size(pinout::PIN_RGB)) {
+        throw std::runtime_error(
+            py::str("Geometry lane count {} exceeds the pinout with {} rgb "
+                    "pins ({} lanes)")
+                .attr("format")(geometry.n_lanes, std::size(pinout::PIN_RGB),
+                                std::size(pinout::PIN_RGB) / 3)
+                .template cast<std::string>());
+    }
     if (buffer_size_in_bytes != data_size_in_bytes) {
         throw std::runtime_error(
             py::str("Framebuffer size must be {} bytes ({} elements of {} "
@@ -217,19 +225,21 @@ The default, 10, is the maximum value.
              py::arg("rotation") = piomatter::orientation::normal,
              py::arg("n_planes") = 10u)
         .def(py::init([](size_t width, size_t height, size_t n_addr_lines,
-                         piomatter::matrix_map map, size_t n_planes) {
-                 size_t n_lines = 2 << n_addr_lines;
+                         piomatter::matrix_map map, size_t n_planes,
+                         size_t n_lanes) {
+                 size_t n_lines = n_lanes << n_addr_lines;
                  size_t pixels_across = width * height / n_lines;
                  for (auto el : map) {
                      if ((size_t)el >= width * height) {
                          throw std::out_of_range("Map element out of range");
                      }
                  }
-                 return piomatter::matrix_geometry(
-                     pixels_across, n_addr_lines, n_planes, width, height, map);
+                 return piomatter::matrix_geometry(pixels_across, n_addr_lines,
+                                                   n_planes, width, height, map,
+                                                   n_lanes);
              }),
              py::arg("width"), py::arg("height"), py::arg("n_addr_lines"),
-             py::arg("map"), py::arg("n_planes") = 10u)
+             py::arg("map"), py::arg("n_planes") = 10u, py::arg("n_lanes") = 2)
         .def_readonly("width", &piomatter::matrix_geometry::width)
         .def_readonly("height", &piomatter::matrix_geometry::height);
 
