@@ -5,8 +5,9 @@
 from collections.abc import Callable
 from typing import Any
 
-import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 import click
+
+import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 
 
 class PybindEnumChoice(click.Choice):

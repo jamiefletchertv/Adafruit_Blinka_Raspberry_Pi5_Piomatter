@@ -37,10 +37,11 @@ or if `/boot/firmware/cmdline.txt` specifies a resolution such as
 `...  video=HDMI-A-1:640x480M@60D`.
 """
 
-import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 import click
 import numpy as np
 import PIL.Image as Image
+
+import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 import adafruit_blinka_raspberry_pi5_piomatter.click as piomatter_click
 
 with open("/sys/class/graphics/fb0/virtual_size") as f:
