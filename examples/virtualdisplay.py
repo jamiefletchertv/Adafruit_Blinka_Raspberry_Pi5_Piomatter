@@ -29,7 +29,7 @@ from subprocess import Popen
 import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 import click
 import numpy as np
-import piomatter_click
+import adafruit_blinka_raspberry_pi5_piomatter.click as piomatter_click
 from pyvirtualdisplay.smartdisplay import SmartDisplay
 
 
