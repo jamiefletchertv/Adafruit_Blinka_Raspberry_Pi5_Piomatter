@@ -211,7 +211,8 @@ void protomatter_render_rgb10(std::vector<uint32_t> &result,
             last_bit = bit;
 
             prep_data(pixels_across);
-            auto mapiter = matrixmap.map.begin() + 2 * addr * pixels_across;
+            auto mapiter = matrixmap.map.begin() +
+                           matrixmap.n_lanes * addr * pixels_across;
             for (size_t x = 0; x < pixels_across; x++) {
                 uint32_t data = addr_bits;
                 for (size_t px = 0; px < matrixmap.n_lanes; px++) {
