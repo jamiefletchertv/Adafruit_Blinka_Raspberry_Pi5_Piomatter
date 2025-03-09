@@ -49,6 +49,7 @@ template <class pinout = adafruit_matrix_bonnet_pinout,
           class colorspace = colorspace_rgb888>
 struct piomatter : piomatter_base {
     using buffer_type = std::vector<uint32_t>;
+    using bufseq_type = std::vector<buffer_type>;
     piomatter(std::span<typename colorspace::data_type const> framebuffer,
               const matrix_geometry &geometry)
         : framebuffer(framebuffer), geometry{geometry}, converter{},
@@ -63,9 +64,13 @@ struct piomatter : piomatter_base {
 
     void show() override {
         int buffer_idx = manager.get_free_buffer();
-        auto &buffer = buffers[buffer_idx];
+        auto &bufseq = buffers[buffer_idx];
+        bufseq.resize(geometry.schedules.size());
         auto converted = converter.convert(framebuffer);
-        protomatter_render_rgb10<pinout>(buffer, geometry, converted.data());
+        for (size_t i = 0; i < geometry.schedules.size(); i++) {
+            protomatter_render_rgb10<pinout>(
+                bufseq[i], geometry, geometry.schedules[i], converted.data());
+        }
         manager.put_filled_buffer(buffer_idx);
     }
 
@@ -161,26 +166,27 @@ struct piomatter : piomatter_base {
     }
 
     void blit_thread() {
-        const uint32_t *databuf = nullptr;
-        size_t datasize = 0;
-        int old_buffer_idx = buffer_manager::no_buffer;
+        int cur_buffer_idx = buffer_manager::no_buffer;
         int buffer_idx;
+        int seq_idx = -1;
         uint64_t t0, t1;
         t0 = monotonicns64();
         while ((buffer_idx = manager.get_filled_buffer()) !=
                buffer_manager::exit_request) {
             if (buffer_idx != buffer_manager::no_buffer) {
-                const auto &buffer = buffers[buffer_idx];
-                databuf = &buffer[0];
-                datasize = buffer.size() * sizeof(*databuf);
-                if (old_buffer_idx != buffer_manager::no_buffer) {
-                    manager.put_free_buffer(old_buffer_idx);
+                if (cur_buffer_idx != buffer_manager::no_buffer) {
+                    manager.put_free_buffer(cur_buffer_idx);
                 }
-                old_buffer_idx = buffer_idx;
+                cur_buffer_idx = buffer_idx;
             }
-            if (datasize) {
+            if (cur_buffer_idx != buffer_manager::no_buffer) {
+                const auto &cur_buf = buffers[cur_buffer_idx];
+                seq_idx = (seq_idx + 1) % cur_buf.size();
+                const auto &data = cur_buf[seq_idx];
+                auto datasize = sizeof(uint32_t) * data.size();
+                auto dataptr = const_cast<uint32_t *>(&data[0]);
                 pio_sm_xfer_data_large(pio, sm, PIO_DIR_TO_SM, datasize,
-                                       (uint32_t *)databuf);
+                                       dataptr);
                 t1 = monotonicns64();
                 if (t0 != t1) {
                     fps = 1e9 / (t1 - t0);
@@ -195,7 +201,7 @@ struct piomatter : piomatter_base {
     PIO pio = NULL;
     int sm = -1;
     std::span<typename colorspace::data_type const> framebuffer;
-    buffer_type buffers[3];
+    bufseq_type buffers[3];
     buffer_manager manager{};
     matrix_geometry geometry;
     colorspace converter;

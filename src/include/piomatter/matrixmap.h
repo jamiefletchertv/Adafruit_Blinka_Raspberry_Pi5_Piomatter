@@ -86,8 +86,9 @@ struct schedule_entry {
 };
 
 using schedule = std::vector<schedule_entry>;
+using schedule_sequence = std::vector<schedule>;
 
-schedule make_simple_schedule(int n_planes, int pixels_across) {
+schedule_sequence make_simple_schedule(int n_planes, int pixels_across) {
     schedule result;
     uint32_t max_count = 1 << n_planes;
     while (max_count < pixels_across)
@@ -96,7 +97,7 @@ schedule make_simple_schedule(int n_planes, int pixels_across) {
     for (int i = 0; i < n_planes; i++) {
         result.emplace_back(10 - i, max_count >> i);
     }
-    return result;
+    return {result};
 }
 
 struct matrix_geometry {
@@ -115,10 +116,10 @@ struct matrix_geometry {
 
     matrix_geometry(size_t pixels_across, size_t n_addr_lines, size_t width,
                     size_t height, matrix_map map, size_t n_lanes,
-                    const std::vector<schedule_entry> schedule)
+                    const schedule_sequence &schedules)
         : pixels_across(pixels_across), n_addr_lines(n_addr_lines),
           n_lanes(n_lanes), width(width), height(height),
-          map(map), schedule{schedule} {
+          map(map), schedules{schedules} {
         size_t pixels_down = n_lanes << n_addr_lines;
         if (map.size() != pixels_down * pixels_across) {
             throw std::range_error(
@@ -127,7 +128,7 @@ struct matrix_geometry {
     }
 
     size_t pixels_across, n_addr_lines, n_lanes;
-    std::vector<schedule_entry> schedule;
+    schedule_sequence schedules;
     size_t width, height;
     matrix_map map;
 };

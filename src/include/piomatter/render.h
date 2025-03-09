@@ -132,7 +132,7 @@ struct colorspace_rgb10 {
 template <typename pinout>
 void protomatter_render_rgb10(std::vector<uint32_t> &result,
                               const matrix_geometry &matrixmap,
-                              const uint32_t *pixels) {
+                              const schedule &sched, const uint32_t *pixels) {
     result.clear();
 
     int data_count = 0;
@@ -194,8 +194,8 @@ void protomatter_render_rgb10(std::vector<uint32_t> &result,
     uint32_t addr_bits = calc_addr_bits(prev_addr);
 
     for (size_t addr = 0; addr < n_addr; addr++) {
-        uint32_t active_time = matrixmap.schedule.back().active_time;
-        for (auto &schedule_ent : matrixmap.schedule) {
+        uint32_t active_time = sched.back().active_time;
+        for (auto &schedule_ent : sched) {
             uint32_t r_mask = 1 << (20 + schedule_ent.shift);
             uint32_t g_mask = 1 << (10 + schedule_ent.shift);
             uint32_t b_mask = 1 << (0 + schedule_ent.shift);
