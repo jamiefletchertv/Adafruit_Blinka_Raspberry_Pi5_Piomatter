@@ -89,6 +89,9 @@ using schedule = std::vector<schedule_entry>;
 using schedule_sequence = std::vector<schedule>;
 
 schedule_sequence make_simple_schedule(int n_planes, int pixels_across) {
+    if (n_planes < 1 || n_planes > 10) {
+        throw std::range_error("n_planes out of range");
+    }
     schedule result;
     uint32_t max_count = 1 << n_planes;
     while (max_count < pixels_across)
@@ -100,6 +103,54 @@ schedule_sequence make_simple_schedule(int n_planes, int pixels_across) {
     return {result};
 }
 
+// Make a temporal dither schedule. All the top `n_planes` are shown everytime,
+// but the lowest frames are done in a cycle of `n_temporal_frames`:
+//   2: {0, 1}; 4: {0, 1, 2, 3}
+schedule_sequence make_temporal_dither_schedule(int n_planes, int pixels_across,
+                                                int n_temporal_planes) {
+    if (n_planes < 1 || n_planes > 10) {
+        throw std::range_error("n_planes out of range");
+    }
+    if (n_temporal_planes == 0) {
+        return make_simple_schedule(n_planes, pixels_across);
+    }
+    if (n_temporal_planes >= n_planes) {
+        throw std::range_error("n_temporal_planes out of range");
+    }
+    if (n_temporal_planes != 2 && n_temporal_planes != 4) {
+        throw std::range_error("n_temporal_planes out of range");
+    }
+
+    int n_real_planes = n_planes - n_temporal_planes;
+    printf("n_planes = %d n_temporal_planes=%d n_real_planes=%d\n", n_planes,
+           n_temporal_planes, n_real_planes);
+    uint32_t max_count = 2 << n_real_planes;
+    uint32_t temporal_count = 1;
+    while (max_count < pixels_across) {
+        max_count <<= 1;
+        temporal_count <<= 1;
+    }
+
+    schedule base_sched;
+    for (int j = 0; j < n_real_planes; j++) {
+        base_sched.emplace_back(10 - j, max_count >> j);
+    }
+
+    schedule_sequence result;
+
+    auto add_sched = [&result, &base_sched](int plane, int count) {
+        auto sched = base_sched;
+        sched.emplace_back(10 - plane, count);
+        result.emplace_back(sched);
+    };
+
+    for (int i = 0; i < n_temporal_planes; i++) {
+        add_sched(n_real_planes + i, temporal_count << i);
+    }
+
+    return result;
+}
+
 struct matrix_geometry {
     template <typename Cb>
     matrix_geometry(size_t pixels_across, size_t n_addr_lines, int n_planes,
@@ -109,10 +160,12 @@ struct matrix_geometry {
               make_matrixmap(width, height, n_addr_lines, serpentine, cb), 2) {}
 
     matrix_geometry(size_t pixels_across, size_t n_addr_lines, int n_planes,
-                    size_t width, size_t height, matrix_map map, size_t n_lanes)
+                    size_t width, size_t height, matrix_map map, size_t n_lanes,
+                    size_t n_temporal_dither = 0)
         : matrix_geometry(pixels_across, n_addr_lines, width, height, map,
                           n_lanes,
-                          make_simple_schedule(n_planes, pixels_across)) {}
+                          make_temporal_dither_schedule(
+                              n_planes, n_temporal_dither, pixels_across)) {}
 
     matrix_geometry(size_t pixels_across, size_t n_addr_lines, size_t width,
                     size_t height, matrix_map map, size_t n_lanes,
