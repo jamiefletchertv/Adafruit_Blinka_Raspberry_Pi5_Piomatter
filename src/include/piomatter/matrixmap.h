@@ -104,7 +104,7 @@ schedule_sequence make_simple_schedule(int n_planes, size_t pixels_across) {
 }
 
 // Make a temporal dither schedule. All the top `n_planes` are shown everytime,
-// but the lowest frames are done in a cycle of `n_temporal_frames`:
+// but the lowest planes are done in a cycle of `n_temporal_planes`:
 //   2: {0, 1}; 4: {0, 1, 2, 3}
 schedule_sequence make_temporal_dither_schedule(int n_planes,
                                                 size_t pixels_across,
@@ -112,7 +112,8 @@ schedule_sequence make_temporal_dither_schedule(int n_planes,
     if (n_planes < 1 || n_planes > 10) {
         throw std::range_error("n_planes out of range");
     }
-    if (n_temporal_planes == 0) {
+    if (n_temporal_planes < 2) {
+        // either 0 or 1 temporal planes are not really temporal at all
         return make_simple_schedule(n_planes, pixels_across);
     }
     if (n_temporal_planes >= n_planes) {
