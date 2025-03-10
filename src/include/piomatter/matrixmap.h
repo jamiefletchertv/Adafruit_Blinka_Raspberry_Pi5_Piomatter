@@ -155,18 +155,20 @@ schedule_sequence make_temporal_dither_schedule(int n_planes,
 struct matrix_geometry {
     template <typename Cb>
     matrix_geometry(size_t pixels_across, size_t n_addr_lines, int n_planes,
-                    size_t width, size_t height, bool serpentine, const Cb &cb)
+                    int n_temporal_planes, size_t width, size_t height,
+                    bool serpentine, const Cb &cb)
         : matrix_geometry(
-              pixels_across, n_addr_lines, n_planes, width, height,
+              pixels_across, n_addr_lines, n_planes, n_temporal_planes, width,
+              height,
               make_matrixmap(width, height, n_addr_lines, serpentine, cb), 2) {}
 
     matrix_geometry(size_t pixels_across, size_t n_addr_lines, int n_planes,
-                    size_t width, size_t height, matrix_map map, size_t n_lanes,
-                    size_t n_temporal_dither = 0)
+                    int n_temporal_planes, size_t width, size_t height,
+                    matrix_map map, size_t n_lanes)
         : matrix_geometry(pixels_across, n_addr_lines, width, height, map,
                           n_lanes,
                           make_temporal_dither_schedule(
-                              n_planes, n_temporal_dither, pixels_across)) {}
+                              n_planes, n_temporal_planes, pixels_across)) {}
 
     matrix_geometry(size_t pixels_across, size_t n_addr_lines, size_t width,
                     size_t height, matrix_map map, size_t n_lanes,

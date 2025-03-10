@@ -173,19 +173,33 @@ Describe the geometry of a set of panels
 
 The number of pixels in the shift register is automatically computed from these values.
 
+``n_planes`` controls the color depth of the panel. This is separate from the framebuffer
+layout. Decreasing ``n_planes`` can increase FPS at the cost of reduced color fidelity.
+The default, 10, is the maximum value.
+
+``n_temporal_planes`` controls temporal dithering of the panel. The acceptable values
+are 0 (the default), 2, and 4. A higher setting can increase FPS at the cost of
+slightly increasing the variation of brightness across subsequent frames.
+
+For simple panels with just 1 connector (2 color lanes), the following constructor arguments are available:
+
 ``serpentine`` controls the arrangement of multiple panels when they are stacked in rows.
 If it is `True`, then each row goes in the opposite direction of the previous row.
+If this is specified, ``n_lanes`` cannot be, and 2 lanes are always used.
 
 ``rotation`` controls the orientation of the panel(s). Must be one of the ``Orientation``
 constants. Default is ``Orientation.Normal``.
 
-``n_planes`` controls the color depth of the panel. This is separate from the framebuffer
-layout. Decreasing ``n_planes`` can increase FPS at the cost of reduced color fidelity.
-The default, 10, is the maximum value.
+For panels with more than 2 lanes, or using a custom pixel mapping, the following constructor arguments are available:
+
+``n_lanes`` controls how many color lanes are used. A single 16-pin HUB75 connector has 2 color lanes.
+If 2 or 3 connectors are used, then there are 4 or 6 lanes.
+
+``map`` is a Python list of integers giving the framebuffer pixel indices for each matrix pixel.
 )pbdoc")
         .def(py::init([](size_t width, size_t height, size_t n_addr_lines,
                          bool serpentine, piomatter::orientation rotation,
-                         size_t n_planes) {
+                         size_t n_planes, size_t n_temporal_planes) {
                  size_t n_lines = 2 << n_addr_lines;
                  size_t pixels_across = width * height / n_lines;
                  size_t odd = (width * height) % n_lines;
@@ -201,33 +215,37 @@ The default, 10, is the maximum value.
                  switch (rotation) {
                  case piomatter::orientation::normal:
                      return piomatter::matrix_geometry(
-                         pixels_across, n_addr_lines, n_planes, width, height,
-                         serpentine, piomatter::orientation_normal);
+                         pixels_across, n_addr_lines, n_planes,
+                         n_temporal_planes, width, height, serpentine,
+                         piomatter::orientation_normal);
 
                  case piomatter::orientation::r180:
                      return piomatter::matrix_geometry(
-                         pixels_across, n_addr_lines, n_planes, width, height,
-                         serpentine, piomatter::orientation_r180);
+                         pixels_across, n_addr_lines, n_planes,
+                         n_temporal_planes, width, height, serpentine,
+                         piomatter::orientation_r180);
 
                  case piomatter::orientation::ccw:
                      return piomatter::matrix_geometry(
-                         pixels_across, n_addr_lines, n_planes, width, height,
-                         serpentine, piomatter::orientation_ccw);
+                         pixels_across, n_addr_lines, n_planes,
+                         n_temporal_planes, width, height, serpentine,
+                         piomatter::orientation_ccw);
 
                  case piomatter::orientation::cw:
                      return piomatter::matrix_geometry(
-                         pixels_across, n_addr_lines, n_planes, width, height,
-                         serpentine, piomatter::orientation_cw);
+                         pixels_across, n_addr_lines, n_planes,
+                         n_temporal_planes, width, height, serpentine,
+                         piomatter::orientation_cw);
                  }
                  throw std::runtime_error("invalid rotation");
              }),
              py::arg("width"), py::arg("height"), py::arg("n_addr_lines"),
              py::arg("serpentine") = true,
              py::arg("rotation") = piomatter::orientation::normal,
-             py::arg("n_planes") = 10u)
+             py::arg("n_planes") = 10u, py::arg("n_temporal_planes") = 2)
         .def(py::init([](size_t width, size_t height, size_t n_addr_lines,
                          piomatter::matrix_map map, size_t n_planes,
-                         size_t n_lanes) {
+                         size_t n_temporal_planes, size_t n_lanes) {
                  size_t n_lines = n_lanes << n_addr_lines;
                  size_t pixels_across = width * height / n_lines;
                  for (auto el : map) {
@@ -236,11 +254,12 @@ The default, 10, is the maximum value.
                      }
                  }
                  return piomatter::matrix_geometry(pixels_across, n_addr_lines,
-                                                   n_planes, width, height, map,
-                                                   n_lanes);
+                                                   n_planes, n_temporal_planes,
+                                                   width, height, map, n_lanes);
              }),
              py::arg("width"), py::arg("height"), py::arg("n_addr_lines"),
-             py::arg("map"), py::arg("n_planes") = 10u, py::arg("n_lanes") = 2)
+             py::arg("map"), py::arg("n_planes") = 10u,
+             py::arg("n_temporal_planes") = 0u, py::arg("n_lanes") = 2)
         .def_readonly("width", &piomatter::matrix_geometry::width)
         .def_readonly("height", &piomatter::matrix_geometry::height);
 
