@@ -31,10 +31,10 @@ from subprocess import Popen, run
 
 import click
 import numpy as np
-import piomatter_click
 from pyvirtualdisplay.smartdisplay import SmartDisplay
 
 import adafruit_blinka_raspberry_pi5_piomatter as piomatter
+import adafruit_blinka_raspberry_pi5_piomatter.click as piomatter_click
 
 keyboard_debug = False
 keys_down = set()
