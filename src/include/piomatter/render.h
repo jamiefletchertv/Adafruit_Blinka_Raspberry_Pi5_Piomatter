@@ -187,7 +187,6 @@ void protomatter_render_rgb10(std::vector<uint32_t> &result,
     // address)
 
     const size_t n_addr = 1u << matrixmap.n_addr_lines;
-    constexpr size_t n_bits = 10u;
     const size_t pixels_across = matrixmap.pixels_across;
 
     size_t prev_addr = n_addr - 1;

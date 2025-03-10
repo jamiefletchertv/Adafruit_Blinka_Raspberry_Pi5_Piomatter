@@ -88,12 +88,12 @@ struct schedule_entry {
 using schedule = std::vector<schedule_entry>;
 using schedule_sequence = std::vector<schedule>;
 
-schedule_sequence make_simple_schedule(int n_planes, int pixels_across) {
+schedule_sequence make_simple_schedule(int n_planes, size_t pixels_across) {
     if (n_planes < 1 || n_planes > 10) {
         throw std::range_error("n_planes out of range");
     }
     schedule result;
-    uint32_t max_count = 1 << n_planes;
+    size_t max_count = 1 << n_planes;
     while (max_count < pixels_across)
         max_count <<= 1;
 
@@ -106,7 +106,8 @@ schedule_sequence make_simple_schedule(int n_planes, int pixels_across) {
 // Make a temporal dither schedule. All the top `n_planes` are shown everytime,
 // but the lowest frames are done in a cycle of `n_temporal_frames`:
 //   2: {0, 1}; 4: {0, 1, 2, 3}
-schedule_sequence make_temporal_dither_schedule(int n_planes, int pixels_across,
+schedule_sequence make_temporal_dither_schedule(int n_planes,
+                                                size_t pixels_across,
                                                 int n_temporal_planes) {
     if (n_planes < 1 || n_planes > 10) {
         throw std::range_error("n_planes out of range");
@@ -181,8 +182,8 @@ struct matrix_geometry {
     }
 
     size_t pixels_across, n_addr_lines, n_lanes;
-    schedule_sequence schedules;
     size_t width, height;
     matrix_map map;
+    schedule_sequence schedules;
 };
 } // namespace piomatter
