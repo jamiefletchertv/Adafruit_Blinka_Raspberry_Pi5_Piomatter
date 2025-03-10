@@ -34,7 +34,6 @@ def make_pixelmap_multilane(width, height, n_addr_lines, n_lanes):
             for lane in range(n_lanes):
                 y = addr + lane * n_addr
                 m.append(x + width * y)
-    print(m)
     return m
 
 
@@ -42,7 +41,7 @@ canvas = Image.new('RGB', (width, height), (0, 0, 0))
 draw = ImageDraw.Draw(canvas)
 
 pixelmap = make_pixelmap_multilane(width, height, n_addr_lines, n_lanes)
-geometry = piomatter.Geometry(width=width, height=height, n_addr_lines=n_addr_lines, n_planes=8, map=pixelmap, n_lanes=n_lanes)
+geometry = piomatter.Geometry(width=width, height=height, n_addr_lines=n_addr_lines, n_planes=10, n_temporal_planes=4, map=pixelmap, n_lanes=n_lanes)
 framebuffer = np.asarray(canvas) + 0  # Make a mutable copy
 matrix = piomatter.PioMatter(colorspace=piomatter.Colorspace.RGB888Packed,
                              pinout=piomatter.Pinout.Active3,
@@ -122,6 +121,7 @@ try:
                     draw.circle((x, pen_radius + ((step+1) * (pen_radius* 2) + (2 * (step+1)))), pen_radius, color)
                     update_matrix()
 
+        print(matrix.fps)
         clearing = not clearing
 
 except KeyboardInterrupt:

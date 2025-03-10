@@ -124,6 +124,11 @@ int main(int argc, char **argv) {
     test_temporal_dither_schedule(5, 1, 2);
     test_temporal_dither_schedule(5, 1, 4);
 
+    test_simple_dither_schedule(6, 1);
+    test_temporal_dither_schedule(6, 1, 0);
+    test_temporal_dither_schedule(6, 1, 2);
+    test_temporal_dither_schedule(6, 1, 4);
+
     test_simple_dither_schedule(5, 16);
     test_temporal_dither_schedule(5, 16, 2);
     test_temporal_dither_schedule(5, 16, 4);
@@ -132,9 +137,14 @@ int main(int argc, char **argv) {
     test_temporal_dither_schedule(5, 24, 2);
     test_temporal_dither_schedule(5, 24, 4);
 
+    test_simple_dither_schedule(10, 24);
+    test_temporal_dither_schedule(10, 24, 8);
+
+    test_temporal_dither_schedule(5, 128, 4);
+    test_temporal_dither_schedule(5, 192, 4);
     return 0;
 
-    piomatter::matrix_geometry geometry(128, 4, 10, 64, 64, true,
+    piomatter::matrix_geometry geometry(128, 4, 10, 0, 64, 64, true,
                                         piomatter::orientation_normal);
     piomatter::piomatter p(std::span(&pixels[0][0], 64 * 64), geometry);
 

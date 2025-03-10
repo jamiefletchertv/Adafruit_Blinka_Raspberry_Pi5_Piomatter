@@ -132,7 +132,8 @@ struct colorspace_rgb10 {
 template <typename pinout>
 void protomatter_render_rgb10(std::vector<uint32_t> &result,
                               const matrix_geometry &matrixmap,
-                              const schedule &sched, const uint32_t *pixels) {
+                              const schedule &sched, uint32_t old_active_time,
+                              const uint32_t *pixels) {
     result.clear();
 
     int data_count = 0;
@@ -153,7 +154,7 @@ void protomatter_render_rgb10(std::vector<uint32_t> &result,
         data_count = n;
     };
 
-    int32_t active_time;
+    int32_t active_time = old_active_time;
 
     auto do_data_clk_active = [&active_time, &data_count, &result](uint32_t d) {
         bool active = active_time > 0;
@@ -193,7 +194,6 @@ void protomatter_render_rgb10(std::vector<uint32_t> &result,
     uint32_t addr_bits = calc_addr_bits(prev_addr);
 
     for (size_t addr = 0; addr < n_addr; addr++) {
-        uint32_t active_time = sched.back().active_time;
         for (auto &schedule_ent : sched) {
             uint32_t r_mask = 1 << (20 + schedule_ent.shift);
             uint32_t g_mask = 1 << (10 + schedule_ent.shift);
