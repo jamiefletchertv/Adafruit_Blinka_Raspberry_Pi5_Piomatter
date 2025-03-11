@@ -29,11 +29,13 @@ import termios
 import tty
 from subprocess import Popen, run
 
-import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 import click
 import numpy as np
-import piomatter_click
 from pyvirtualdisplay.smartdisplay import SmartDisplay
+
+import adafruit_blinka_raspberry_pi5_piomatter as piomatter
+import adafruit_blinka_raspberry_pi5_piomatter.click as piomatter_click
+from adafruit_blinka_raspberry_pi5_piomatter.pixelmappers import simple_multilane_mapper
 
 keyboard_debug = False
 keys_down = set()
@@ -91,8 +93,8 @@ ctrl_modified_range = (1, 26)
 @click.option("--ctrl-c-interrupt/--no-ctrl-c-interrupt", help="If Ctrl+C should be handled as an interrupt.", default=True)
 @piomatter_click.standard_options
 @click.argument("command", nargs=-1)
-def main(scale, backend, use_xauth, extra_args, rfbport, width, height, serpentine, rotation, pinout, n_planes,
-         n_addr_lines, ctrl_c_interrupt, command):
+def main(scale, backend, use_xauth, extra_args, rfbport, width, height, serpentine, rotation, pinout, n_planes, n_temporal_planes,
+         n_addr_lines, n_lanes, ctrl_c_interrupt, command):
     def handle_key_event(evt_data):
         if evt_data in key_map.keys():
             keys_down.add(key_map[evt_data])
@@ -132,8 +134,11 @@ def main(scale, backend, use_xauth, extra_args, rfbport, width, height, serpenti
     if extra_args:
         kwargs['extra_args'] = shlex.split(extra_args)
     print("xauth", use_xauth)
-    geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines,
-                                  rotation=rotation)
+    if n_lanes != 2:
+        pixelmap = simple_multilane_mapper(width, height, n_addr_lines, n_lanes)
+        geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines, n_temporal_planes=n_temporal_planes, n_lanes=n_lanes, map=pixelmap)
+    else:
+        geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_temporal_planes=n_temporal_planes, n_addr_lines=n_addr_lines, rotation=rotation)
     framebuffer = np.zeros(shape=(geometry.height, geometry.width, 3), dtype=np.uint8)
     matrix = piomatter.PioMatter(colorspace=piomatter.Colorspace.RGB888Packed, pinout=pinout, framebuffer=framebuffer,
                                  geometry=geometry)

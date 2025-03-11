@@ -3,5 +3,6 @@
 # SPDX-License-Identifier: Unlicense
 
 sphinx
+sphinx-autoapi
 sphinx-rtd-theme
 sphinxcontrib-jquery
