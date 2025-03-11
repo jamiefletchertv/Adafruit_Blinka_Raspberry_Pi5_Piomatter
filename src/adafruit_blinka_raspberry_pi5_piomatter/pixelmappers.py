@@ -1,3 +1,5 @@
+"""Functions to define the layout of complex setups, particularly multi-connector matrices"""
+
 def simple_multilane_mapper(width, height, n_addr_lines, n_lanes):
     """A simple mapper for 4+ pixel lanes
 
@@ -7,7 +9,7 @@ def simple_multilane_mapper(width, height, n_addr_lines, n_lanes):
     Rotation is not supported, and neither are more complicated arrangements of panels
     within a single chain (no support for serpentine or stacked panels within a segment)
 
-    .. code-block:: raw
+    .. code-block::
 
         0 -> [panel] -> [panel]
         1 -> [panel] -> [panel]

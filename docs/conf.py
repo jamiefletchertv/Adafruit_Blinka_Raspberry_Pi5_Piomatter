@@ -26,13 +26,27 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
+    "autoapi.extension",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
 ]
 
-autosummary_generate = True
+autoapi_keep_files = True
+autoapi_dirs = ["../src/adafruit_blinka_raspberry_pi5_piomatter"]
+autoapi_add_toctree_entry = True
+autoapi_options = [
+    "members",
+    "undoc-members",
+    "show-inheritance",
+    "special-members",
+    "show-module-summary",
+]
+
+autoapi_python_class_content = "both"
+autoapi_python_use_implicit_namespaces = True
+autoapi_template_dir = "autoapi/templates"
+autoapi_root = "api"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
