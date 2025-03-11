@@ -18,5 +18,6 @@ lint.extend-select = [
 ]
 lint.extend-ignore = [
   "E501",   # Line too long
+  "RUF002",   # Yes I meant to type 'multiplication sign'!
 ]
 target-version = "py311"

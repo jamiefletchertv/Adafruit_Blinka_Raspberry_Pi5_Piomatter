@@ -15,6 +15,7 @@ import rainbowio
 from PIL import Image, ImageDraw
 
 import adafruit_blinka_raspberry_pi5_piomatter as piomatter
+from adafruit_blinka_raspberry_pi5_piomatter.pixelmappers import simple_multilane_mapper
 
 width = 64
 n_lanes = 6
@@ -22,25 +23,10 @@ n_addr_lines = 5
 height = n_lanes << n_addr_lines
 pen_radius = 1
 
-def make_pixelmap_multilane(width, height, n_addr_lines, n_lanes):
-    calc_height = n_lanes << n_addr_lines
-    if height != calc_height:
-        raise RuntimeError(f"Calculated height {calc_height} does not match requested height {height}")
-    n_addr = 1 << n_addr_lines
-
-    m = []
-    for addr in range(n_addr):
-        for x in range(width):
-            for lane in range(n_lanes):
-                y = addr + lane * n_addr
-                m.append(x + width * y)
-    return m
-
-
 canvas = Image.new('RGB', (width, height), (0, 0, 0))
 draw = ImageDraw.Draw(canvas)
 
-pixelmap = make_pixelmap_multilane(width, height, n_addr_lines, n_lanes)
+pixelmap = simple_multilane_mapper(width, height, n_addr_lines, n_lanes)
 geometry = piomatter.Geometry(width=width, height=height, n_addr_lines=n_addr_lines, n_planes=10, n_temporal_planes=4, map=pixelmap, n_lanes=n_lanes)
 framebuffer = np.asarray(canvas) + 0  # Make a mutable copy
 matrix = piomatter.PioMatter(colorspace=piomatter.Colorspace.RGB888Packed,

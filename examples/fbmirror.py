@@ -17,6 +17,7 @@ import numpy as np
 
 import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 import adafruit_blinka_raspberry_pi5_piomatter.click as piomatter_click
+from adafruit_blinka_raspberry_pi5_piomatter.pixelmappers import simple_multilane_mapper
 
 with open("/sys/class/graphics/fb0/virtual_size") as f:
     screenx, screeny = [int(word) for word in f.read().split(",")]
@@ -55,7 +56,7 @@ def make_pixelmap_multilane(width, height, n_addr_lines, n_lanes):
 @piomatter_click.standard_options(n_lanes=2, n_temporal_planes=4)
 def main(xoffset, yoffset, width, height, serpentine, rotation, pinout, n_planes, n_temporal_planes, n_addr_lines, n_lanes):
     if n_lanes != 2:
-        pixelmap = make_pixelmap_multilane(width, height, n_addr_lines, n_lanes)
+        pixelmap = simple_multilane_mapper(width, height, n_addr_lines, n_lanes)
         geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines, n_temporal_planes=n_temporal_planes, n_lanes=n_lanes, map=pixelmap)
     else:
         geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines, n_temporal_planes=n_temporal_planes, rotation=rotation)
