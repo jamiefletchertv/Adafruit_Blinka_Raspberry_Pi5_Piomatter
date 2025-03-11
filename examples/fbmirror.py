@@ -35,21 +35,6 @@ with open("/sys/class/graphics/fb0/stride") as f:
 
 linux_framebuffer = np.memmap('/dev/fb0',mode='r', shape=(screeny, stride // bytes_per_pixel), dtype=dtype)
 
-def make_pixelmap_multilane(width, height, n_addr_lines, n_lanes):
-    calc_height = n_lanes << n_addr_lines
-    if height != calc_height:
-        raise RuntimeError(f"Calculated height {calc_height} does not match requested height {height}")
-    n_addr = 1 << n_addr_lines
-
-    m = []
-    for addr in range(n_addr):
-        for x in range(width):
-            for lane in range(n_lanes):
-                y = addr + lane * n_addr
-                m.append(x + width * y)
-    print(m)
-    return m
-
 @click.command
 @click.option("--x-offset", "xoffset", type=int, help="The x offset of top left corner of the region to mirror",  default=0)
 @click.option("--y-offset", "yoffset", type=int, help="The y offset of top left corner of the region to mirror", default=0)
