@@ -50,7 +50,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "adafruit-blinka-pi5-piomatter"
-copyright = "2023 Jeff Epler"
+copyright = "2025 Jeff Epler"
 author = "Jeff Epler"
 
 # The version info for the project you're documenting, acts as replacement for
