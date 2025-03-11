@@ -53,7 +53,7 @@ def make_pixelmap_multilane(width, height, n_addr_lines, n_lanes):
 @click.command
 @click.option("--x-offset", "xoffset", type=int, help="The x offset of top left corner of the region to mirror",  default=0)
 @click.option("--y-offset", "yoffset", type=int, help="The y offset of top left corner of the region to mirror", default=0)
-@piomatter_click.standard_options(n_lanes=2, n_temporal_planes=4)
+@piomatter_click.standard_options
 def main(xoffset, yoffset, width, height, serpentine, rotation, pinout, n_planes, n_temporal_planes, n_addr_lines, n_lanes):
     if n_lanes != 2:
         pixelmap = simple_multilane_mapper(width, height, n_addr_lines, n_lanes)

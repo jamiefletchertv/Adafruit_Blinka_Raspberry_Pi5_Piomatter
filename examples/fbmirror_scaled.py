@@ -43,6 +43,7 @@ import PIL.Image as Image
 
 import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 import adafruit_blinka_raspberry_pi5_piomatter.click as piomatter_click
+from adafruit_blinka_raspberry_pi5_piomatter.pixelmappers import simple_multilane_mapper
 
 with open("/sys/class/graphics/fb0/virtual_size") as f:
     screenx, screeny = [int(word) for word in f.read().split(",")]
@@ -66,8 +67,12 @@ linux_framebuffer = np.memmap('/dev/fb0',mode='r', shape=(screeny, stride // byt
 @click.option("--y-offset", "yoffset", type=int, help="The y offset of top left corner of the region to mirror", default=0)
 @click.option("--scale", "scale", type=int, help="The scale factor to reduce the display down by.", default=3)
 @piomatter_click.standard_options
-def main(xoffset, yoffset, scale, width, height, serpentine, rotation, pinout, n_planes, n_addr_lines):
-    geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines, rotation=rotation)
+def main(xoffset, yoffset, scale, width, height, serpentine, rotation, pinout, n_planes, n_temporal_planes, n_addr_lines, n_lanes):
+    if n_lanes != 2:
+        pixelmap = simple_multilane_mapper(width, height, n_addr_lines, n_lanes)
+        geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines, n_temporal_planes=n_temporal_planes, n_lanes=n_lanes, map=pixelmap)
+    else:
+        geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_temporal_planes=n_temporal_planes, n_addr_lines=n_addr_lines, rotation=rotation)
     matrix_framebuffer = np.zeros(shape=(geometry.height, geometry.width, 3), dtype=np.uint8)
     matrix = piomatter.PioMatter(colorspace=piomatter.Colorspace.RGB888Packed, pinout=pinout, framebuffer=matrix_framebuffer, geometry=geometry)
 

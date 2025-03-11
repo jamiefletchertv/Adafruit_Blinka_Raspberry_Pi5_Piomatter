@@ -40,9 +40,9 @@ def standard_options(
     rotation=piomatter.Orientation.Normal,
     pinout=piomatter.Pinout.AdafruitMatrixBonnet,
     n_planes=10,
-    n_temporal_planes=None,
+    n_temporal_planes=0,
     n_addr_lines=4,
-    n_lanes=None,
+    n_lanes=2,
 ) -> Callable[[], None]:
     """Add standard commandline flags, with the defaults given
 
