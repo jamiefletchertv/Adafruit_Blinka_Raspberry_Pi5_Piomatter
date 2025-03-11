@@ -10,7 +10,7 @@ import click
 import adafruit_blinka_raspberry_pi5_piomatter as piomatter
 
 
-class PybindEnumChoice(click.Choice):
+class _PybindEnumChoice(click.Choice):
     def __init__(self, enum, case_sensitive=False):
         self.enum = enum
         choices = [k for k, v in enum.__dict__.items() if isinstance(v, enum)]
@@ -26,7 +26,7 @@ class PybindEnumChoice(click.Choice):
         r = getattr(self.enum, value)
         return r
 
-def validate_temporal_planes(ctx, param, value):
+def _validate_temporal_planes(ctx, param, value):
     if value not in (0, 2, 4):
         raise click.BadParameter("must be 0, 2, or 4")
     return value
@@ -69,7 +69,7 @@ def standard_options(
             f = click.option(
                 "--pinout",
                 default=pinout,
-                type=PybindEnumChoice(piomatter.Pinout),
+                type=_PybindEnumChoice(piomatter.Pinout),
                 help="The details of the electrical connection to the panels"
             )(f)
         if rotation is not None:
@@ -77,13 +77,13 @@ def standard_options(
                 "--orientation",
                 "rotation",
                 default=rotation,
-                type=PybindEnumChoice(piomatter.Orientation),
+                type=_PybindEnumChoice(piomatter.Orientation),
                 help="The overall orientation (rotation) of the panels"
             )(f)
         if n_planes is not None:
             f = click.option("--num-planes", "n_planes", default=n_planes, help="The number of bit planes (color depth). Lower values can improve refresh rate in frames per second")(f)
         if n_temporal_planes is not None:
-            f = click.option("--num-temporal-planes", "n_temporal_planes", default=n_temporal_planes, callback=validate_temporal_planes, help="The number of temporal bit-planes. May be 0, 2, or 4. Nonzero values improve frame rate but can cause some shimmer")(f)
+            f = click.option("--num-temporal-planes", "n_temporal_planes", default=n_temporal_planes, callback=_validate_temporal_planes, help="The number of temporal bit-planes. May be 0, 2, or 4. Nonzero values improve frame rate but can cause some shimmer")(f)
         if n_addr_lines is not None:
             f = click.option("--num-address-lines", "n_addr_lines", default=n_addr_lines, help="The number of address lines used by the panels")(f)
         if n_lanes is not None:
