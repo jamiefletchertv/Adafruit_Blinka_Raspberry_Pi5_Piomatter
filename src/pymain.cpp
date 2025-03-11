@@ -129,8 +129,6 @@ PYBIND11_MODULE(_piomatter, m) {
            Colorspace
            Geometry
            PioMatter
-           AdafruitMatrixBonnetRGB888
-           AdafruitMatrixBonnetRGB888Packed
     )pbdoc";
 
     py::enum_<piomatter::orientation>(

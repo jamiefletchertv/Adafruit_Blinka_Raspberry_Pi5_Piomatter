@@ -1,7 +1,4 @@
 from ._piomatter import (
-    AdafruitMatrixBonnetRGB565,
-    AdafruitMatrixBonnetRGB888,
-    AdafruitMatrixBonnetRGB888Packed,
     Colorspace,
     Geometry,
     Orientation,
@@ -10,9 +7,6 @@ from ._piomatter import (
 )
 
 __all__ = [
-    'AdafruitMatrixBonnetRGB565',
-    'AdafruitMatrixBonnetRGB888',
-    'AdafruitMatrixBonnetRGB888Packed',
     'Colorspace',
     'Geometry',
     'Orientation',
