@@ -27,5 +27,4 @@ def simple_multilane_mapper(width, height, n_addr_lines, n_lanes):
             for lane in range(n_lanes):
                 y = addr + lane * n_addr
                 m.append(x + width * y)
-    print(m)
     return m
