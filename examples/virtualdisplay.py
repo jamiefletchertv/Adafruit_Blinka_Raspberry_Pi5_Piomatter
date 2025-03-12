@@ -20,9 +20,6 @@ Here's an example for running an emulator using a rom stored in "/tmp/snesrom.sm
     $ python virtualdisplay.py --pinout AdafruitMatrixHatBGR  --scale 2 --backend xvfb  --width 128 --height 128  --serpentine --num-address-lines 5 --num-planes 4  -- mednafen -snes.xscalefs 1 -snes.yscalefs 1 -snes.xres 128 -video.fs 1 -video.driver softfb  /tmp/snesrom.smc
 """
 
-# To run a nice emulator:
-
-
 import shlex
 from subprocess import Popen
 
