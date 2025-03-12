@@ -38,16 +38,11 @@ RESAMPLE_MAP = {
 @click.option("--mirror-region", help="Region of X display to mirror. Comma seperated x,y,w,h. "
                                       "Default will mirror entire display.", default="")
 @click.option("--x-display", help="The X display to mirror. Default is :0", default=":0")
-@click.option("--resample-method",
-              help="The resample method for PIL to use when resizing the screen image."
-                   "Valid values are: nearest, bilinear, lanczos, and bicubic. Default is nearest",
-              default="nearest")
+@click.option("--resample-method", type=click.Choice(RESAMPLE_MAP), default="nearest",
+              help="The resample method for PIL to use when resizing the screen image. Default is nearest")
 @piomatter_click.standard_options(n_lanes=2, n_temporal_planes=0)
 def main(width, height, serpentine, rotation, pinout, n_planes,
          n_temporal_planes, n_addr_lines, n_lanes, mirror_region, x_display, resample_method):
-
-    if resample_method not in RESAMPLE_MAP.keys():
-        raise ValueError(f"--resample-method must be one of: {RESAMPLE_MAP.keys()}")
 
     if n_lanes != 2:
         pixelmap = simple_multilane_mapper(width, height, n_addr_lines, n_lanes)
