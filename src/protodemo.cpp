@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <map>
 #include <vector>
 
 #include "piomatter/piomatter.h"
@@ -61,7 +62,7 @@ uint32_t pixels[height][width] = {
 #undef w
 #undef _
 
-#define rgb(r, g, b) ((r << 16) | (g << 8) | b)
+#define rgb(r, g, b) (((r) << 16) | ((g) << 8) | (b))
 
 uint32_t colorwheel(int i) {
     i = i & 0xff;
@@ -102,28 +103,42 @@ static void print_dither_schedule(const piomatter::schedule_sequence &ss) {
         }
         printf("\n");
     }
+    printf(" -> ");
+    std::map<int, int> sums;
+    for (auto s : ss) {
+        for (auto i : s) {
+            sums[-i.shift] += i.active_time;
+        }
+    }
+    for (auto const &i : sums) {
+        printf("{%d %d} ", -i.first, i.second);
+    }
     printf("\n");
 }
 
 static void test_simple_dither_schedule(int n_planes, int pixels_across) {
     auto ss = piomatter::make_simple_schedule(n_planes, pixels_across);
     print_dither_schedule(ss);
+    printf("\n");
 }
 static void test_temporal_dither_schedule(int n_planes, int pixels_across,
                                           int n_temporal_frames) {
     auto ss = piomatter::make_temporal_dither_schedule(n_planes, pixels_across,
                                                        n_temporal_frames);
     print_dither_schedule(ss);
+    printf("\n");
 }
 
 int main(int argc, char **argv) {
     int n = argc > 1 ? atoi(argv[1]) : 0;
 
-    test_simple_dither_schedule(5, 1);
-    test_temporal_dither_schedule(5, 1, 0);
-    test_temporal_dither_schedule(5, 1, 2);
-    test_temporal_dither_schedule(5, 1, 4);
+    test_simple_dither_schedule(7, 1);
+    test_temporal_dither_schedule(7, 1, 2);
+    test_temporal_dither_schedule(7, 1, 3);
+    test_temporal_dither_schedule(7, 1, 4);
+    test_temporal_dither_schedule(7, 1, 5);
 
+    return 0;
     test_simple_dither_schedule(6, 1);
     test_temporal_dither_schedule(6, 1, 0);
     test_temporal_dither_schedule(6, 1, 2);
@@ -131,6 +146,7 @@ int main(int argc, char **argv) {
 
     test_simple_dither_schedule(5, 16);
     test_temporal_dither_schedule(5, 16, 2);
+    test_temporal_dither_schedule(5, 16, 3);
     test_temporal_dither_schedule(5, 16, 4);
 
     test_simple_dither_schedule(5, 24);
@@ -140,6 +156,8 @@ int main(int argc, char **argv) {
     test_simple_dither_schedule(10, 24);
     test_temporal_dither_schedule(10, 24, 8);
 
+    test_temporal_dither_schedule(5, 128, 3);
+    test_temporal_dither_schedule(5, 192, 3);
     test_temporal_dither_schedule(5, 128, 4);
     test_temporal_dither_schedule(5, 192, 4);
     return 0;

@@ -39,16 +39,14 @@ enum gpio_irq_level {
 };
 
 enum gpio_override {
-    GPIO_OVERRIDE_NORMAL =
-        0, ///< peripheral signal selected via \ref gpio_set_function
-    GPIO_OVERRIDE_INVERT =
-        1, ///< invert peripheral signal selected via \ref gpio_set_function
-    GPIO_OVERRIDE_LOW = 2,  ///< drive low/disable output
-    GPIO_OVERRIDE_HIGH = 3, ///< drive high/enable output
+    GPIO_OVERRIDE_NORMAL = 0,      ///< peripheral signal selected via \ref gpio_set_function
+    GPIO_OVERRIDE_INVERT = 1,      ///< invert peripheral signal selected via \ref gpio_set_function
+    GPIO_OVERRIDE_LOW = 2,         ///< drive low/disable output
+    GPIO_OVERRIDE_HIGH = 3,        ///< drive high/enable output
 };
 enum gpio_slew_rate {
-    GPIO_SLEW_RATE_SLOW = 0, ///< Slew rate limiting enabled
-    GPIO_SLEW_RATE_FAST = 1  ///< Slew rate limiting disabled
+    GPIO_SLEW_RATE_SLOW = 0,  ///< Slew rate limiting enabled
+    GPIO_SLEW_RATE_FAST = 1   ///< Slew rate limiting disabled
 };
 
 enum gpio_drive_strength {

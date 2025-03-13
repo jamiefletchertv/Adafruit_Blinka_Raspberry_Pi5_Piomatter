@@ -134,47 +134,27 @@ schedule_sequence make_temporal_dither_schedule(int n_planes,
     if (n_temporal_planes >= n_planes) {
         throw std::range_error("n_temporal_planes can't exceed n_planes");
     }
-    if (n_temporal_planes != 2 && n_temporal_planes != 4) {
-        // the code can generate a schedule for 8 temporal planes, but it
-        // flickers intolerably
-        throw std::range_error("n_temporal_planes must be 0, 1, 2, or 4");
-    }
 
     int n_real_planes = n_planes - n_temporal_planes;
 
-    schedule base_sched;
-    for (int j = 0; j < n_real_planes; j++) {
-        base_sched.emplace_back(
-            9 - j, (1 << (n_temporal_planes + n_real_planes - j - 1)) /
-                       n_temporal_planes);
-    }
-
     schedule_sequence result;
 
-    auto add_sched = [&result, &base_sched](int plane, int count) {
-        auto sched = base_sched;
+    auto add_sched = [&result, n_real_planes,
+                      n_temporal_planes](int i, int plane, int count) {
+        schedule sched;
+        for (int j = 0; j < n_real_planes; j++) {
+            int k = 1 << (n_temporal_planes + n_real_planes - j - 1);
+            sched.emplace_back(9 - j, (k + i) / n_temporal_planes);
+        }
         sched.emplace_back(9 - plane, count);
         result.emplace_back(sched);
     };
 
     for (int i = 0; i < n_temporal_planes; i++) {
-        add_sched(n_real_planes + i, 1 << (n_temporal_planes - i - 1));
+        add_sched(i, n_real_planes + i, 1 << (n_temporal_planes - i - 1));
     }
-#if 0
-    std::vector<uint32_t> counts(10, 0);
-    for (auto s : result) {
-        for(auto t: s) {
-            counts[t.shift] += t.active_time;
-        }
-    }
-    for (auto s : counts) {
-        printf("%d ", s);
-    }
-    printf("\n");
-#endif
 
     return rescale_schedule(result, pixels_across);
-    ;
 }
 
 struct matrix_geometry {
