@@ -19,7 +19,7 @@ struct adafruit_matrix_bonnet_pinout {
 
     static constexpr uint32_t post_oe_delay = 0;
     static constexpr uint32_t post_latch_delay = 0;
-    static constexpr uint32_t post_addr_delay = 500;
+    static constexpr uint32_t post_addr_delay = 5;
 };
 
 struct adafruit_matrix_bonnet_pinout_bgr {
@@ -37,7 +37,7 @@ struct adafruit_matrix_bonnet_pinout_bgr {
 
     static constexpr uint32_t post_oe_delay = 0;
     static constexpr uint32_t post_latch_delay = 0;
-    static constexpr uint32_t post_addr_delay = 500;
+    static constexpr uint32_t post_addr_delay = 5;
 };
 
 struct active3_pinout {
@@ -56,7 +56,7 @@ struct active3_pinout {
 
     static constexpr uint32_t post_oe_delay = 0;
     static constexpr uint32_t post_latch_delay = 0;
-    static constexpr uint32_t post_addr_delay = 500;
+    static constexpr uint32_t post_addr_delay = 5;
 };
 
 struct active3_pinout_bgr {
@@ -75,7 +75,7 @@ struct active3_pinout_bgr {
 
     static constexpr uint32_t post_oe_delay = 0;
     static constexpr uint32_t post_latch_delay = 0;
-    static constexpr uint32_t post_addr_delay = 500;
+    static constexpr uint32_t post_addr_delay = 5;
 };
 
 } // namespace piomatter
