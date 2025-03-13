@@ -25,6 +25,7 @@ from subprocess import Popen
 
 import click
 import numpy as np
+from PIL import ImageEnhance
 from pyvirtualdisplay.smartdisplay import SmartDisplay
 
 import adafruit_blinka_raspberry_pi5_piomatter as piomatter
@@ -37,10 +38,12 @@ from adafruit_blinka_raspberry_pi5_piomatter.pixelmappers import simple_multilan
 @click.option("--backend", help="The pyvirtualdisplay backend to use",  default="xvfb")
 @click.option("--extra-args", help="Extra arguments to pass to the backend server",  default="")
 @click.option("--rfbport", help="The port number for the --backend xvnc",  default=None, type=int)
+@click.option("--brightness", help="The brightness factor of the image output to the matrix",
+              default=1.0, type=click.FloatRange(min=0.1, max=1.0))
 @click.option("--use-xauth/--no-use-xauth", help="If a Xauthority file should be created",  default=False)
 @piomatter_click.standard_options
 @click.argument("command", nargs=-1)
-def main(scale, backend, use_xauth, extra_args, rfbport, width, height, serpentine, rotation, pinout,
+def main(scale, backend, use_xauth, extra_args, rfbport, brightness, width, height, serpentine, rotation, pinout,
          n_planes, n_temporal_planes, n_addr_lines, n_lanes, command):
     kwargs = {}
     if backend == "xvnc":
@@ -61,8 +64,12 @@ def main(scale, backend, use_xauth, extra_args, rfbport, width, height, serpenti
     with SmartDisplay(backend=backend, use_xauth=use_xauth, size=(round(width*scale),round(height*scale)), manage_global_env=False, **kwargs) as disp, Popen(command, env=disp.env()) as proc:
             while proc.poll() is None:
                 img = disp.grab(autocrop=False)
+
                 if img is None:
                     continue
+                if brightness != 1.0:
+                    darkener = ImageEnhance.Brightness(img)
+                    img = darkener.enhance(brightness)
                 img = img.resize((width, height))
                 framebuffer[:, :] = np.array(img)
                 matrix.show()
