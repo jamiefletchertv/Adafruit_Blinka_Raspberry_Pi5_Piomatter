@@ -27,8 +27,8 @@ class _PybindEnumChoice(click.Choice):
         return r
 
 def _validate_temporal_planes(ctx, param, value):
-    if value not in (0, 2, 4):
-        raise click.BadParameter("must be 0, 2, or 4")
+    if value not in (0, 1, 2, 3, 4, 5):
+        raise click.BadParameter("must be from 0 to 5 (0 and 1 both disable temporal planes)")
     return value
 
 def standard_options(
