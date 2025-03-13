@@ -144,8 +144,6 @@ schedule_sequence make_temporal_dither_schedule(int n_planes,
         schedule sched;
         for (int j = 0; j < n_real_planes; j++) {
             int k = 1 << (n_temporal_planes + n_real_planes - j - 1);
-            printf("n_real_planes=%d n_temporal_planes=%d plane=%d k=%d\n",
-                   n_real_planes, n_temporal_planes, j, k);
             sched.emplace_back(9 - j, (k + i) / n_temporal_planes);
         }
         sched.emplace_back(9 - plane, count);
@@ -155,21 +153,8 @@ schedule_sequence make_temporal_dither_schedule(int n_planes,
     for (int i = 0; i < n_temporal_planes; i++) {
         add_sched(i, n_real_planes + i, 1 << (n_temporal_planes - i - 1));
     }
-#if 0
-    std::vector<uint32_t> counts(10, 0);
-    for (auto s : result) {
-        for(auto t: s) {
-            counts[t.shift] += t.active_time;
-        }
-    }
-    for (auto s : counts) {
-        printf("%d ", s);
-    }
-    printf("\n");
-#endif
 
     return rescale_schedule(result, pixels_across);
-    ;
 }
 
 struct matrix_geometry {
