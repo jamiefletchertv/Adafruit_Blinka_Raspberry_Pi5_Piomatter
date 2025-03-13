@@ -20,20 +20,6 @@ static uint64_t monotonicns64() {
 
 constexpr size_t MAX_XFER = 65532;
 
-void pio_sm_xfer_data_large(PIO pio, int sm, int direction, size_t size,
-                            uint32_t *databuf) {
-    while (size) {
-        size_t xfersize = std::min(size_t{MAX_XFER}, size);
-        int r = pio_sm_xfer_data(pio, sm, direction, xfersize, databuf);
-        if (r) {
-            throw std::runtime_error(
-                "pio_sm_xfer_data (reboot may be required)");
-        }
-        size -= xfersize;
-        databuf += xfersize / sizeof(*databuf);
-    }
-}
-
 struct piomatter_base {
     piomatter_base() {}
     piomatter_base(const piomatter_base &) = delete;
@@ -106,7 +92,7 @@ struct piomatter : piomatter_base {
         if (sm < 0) {
             throw std::runtime_error("pio_claim_unused_sm");
         }
-        int r = pio_sm_config_xfer(pio, sm, PIO_DIR_TO_SM, MAX_XFER, 2);
+        int r = pio_sm_config_xfer(pio, sm, PIO_DIR_TO_SM, MAX_XFER, 3);
         if (r) {
             throw std::runtime_error("pio_sm_config_xfer");
         }
@@ -188,8 +174,7 @@ struct piomatter : piomatter_base {
                 const auto &data = cur_buf[seq_idx];
                 auto datasize = sizeof(uint32_t) * data.size();
                 auto dataptr = const_cast<uint32_t *>(&data[0]);
-                pio_sm_xfer_data_large(pio, sm, PIO_DIR_TO_SM, datasize,
-                                       dataptr);
+                pio_sm_xfer_data(pio, sm, PIO_DIR_TO_SM, datasize, dataptr);
                 t1 = monotonicns64();
                 if (t0 != t1) {
                     fps = 1e9 / (t1 - t0);
