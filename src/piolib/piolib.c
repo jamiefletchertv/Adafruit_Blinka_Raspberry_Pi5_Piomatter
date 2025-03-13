@@ -28,26 +28,33 @@ static PIO pio_instances[PIO_MAX_INSTANCES];
 static uint num_instances;
 static pthread_mutex_t pio_handle_lock;
 
-void pio_select(PIO pio) { __pio = pio; }
+void pio_select(PIO pio)
+{
+    __pio = pio;
+}
 
-PIO pio_get_current(void) {
+PIO pio_get_current(void)
+{
     PIO pio = __pio;
     check_pio_param(pio);
     return pio;
 }
 
-int pio_get_index(PIO pio) {
+int pio_get_index(PIO pio)
+{
     int i;
-    for (i = 0; i < PIO_MAX_INSTANCES; i++) {
+    for (i = 0; i < PIO_MAX_INSTANCES; i++)
+    {
         if (pio == pio_instances[i])
             return i;
     }
     return -1;
 }
 
-int pio_init(void) {
+int pio_init(void)
+{
     static bool initialised;
-    const PIO_CHIP_T *const *p;
+    const PIO_CHIP_T * const *p;
     uint i = 0;
     int err;
 
@@ -55,7 +62,8 @@ int pio_init(void) {
         return 0;
     num_instances = 0;
     p = &__start_piochips;
-    while (p < &__stop_piochips && num_instances < PIO_MAX_INSTANCES) {
+    while (p < &__stop_piochips && num_instances < PIO_MAX_INSTANCES)
+    {
         PIO_CHIP_T *chip = *p;
         PIO pio = chip->create_instance(chip, i);
         if (pio && !PIO_IS_ERR(pio)) {
@@ -75,7 +83,8 @@ int pio_init(void) {
     return 0;
 }
 
-PIO pio_open(uint idx) {
+PIO pio_open(uint idx)
+{
     PIO pio = NULL;
     int err;
 
@@ -112,7 +121,8 @@ PIO pio_open(uint idx) {
     return pio;
 }
 
-PIO pio_open_by_name(const char *name) {
+PIO pio_open_by_name(const char *name)
+{
     int err = -ENOENT;
     uint i;
 
@@ -132,33 +142,38 @@ PIO pio_open_by_name(const char *name) {
     return pio_open(i);
 }
 
-PIO pio_open_helper(uint idx) {
+PIO pio_open_helper(uint idx)
+{
     PIO pio = pio_instances[idx];
     if (!pio || !pio->in_use) {
         pio = pio_open(idx);
         if (PIO_IS_ERR(pio)) {
-            printf("* Failed to open PIO device %d (error %d)\n", idx,
-                   PIO_ERR_VAL(pio));
+            printf("* Failed to open PIO device %d (error %d)\n",
+                   idx, PIO_ERR_VAL(pio));
             exit(1);
         }
     }
     return pio;
 }
 
-void pio_close(PIO pio) {
+void pio_close(PIO pio)
+{
     pio->chip->close_instance(pio);
     pthread_mutex_lock(&pio_handle_lock);
     pio->in_use = 0;
     pthread_mutex_unlock(&pio_handle_lock);
 }
 
-void pio_panic(const char *msg) {
+void pio_panic(const char *msg)
+{
     fprintf(stderr, "PANIC: %s\n", msg);
     exit(1);
 }
 
 void sleep_us(uint64_t us) {
-    const struct timespec tv = {.tv_sec = (us / 1000000),
-                                .tv_nsec = 1000ull * (us % 1000000)};
+    const struct timespec tv = {
+        .tv_sec = (us / 1000000),
+        .tv_nsec = 1000ull * (us % 1000000)
+    };
     nanosleep(&tv, NULL);
 }

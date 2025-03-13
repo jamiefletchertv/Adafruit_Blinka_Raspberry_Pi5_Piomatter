@@ -12,6 +12,9 @@
 #
 # See https://github.com/pre-commit/pre-commit
 
+# Don't re-format vendored files
+exclude: "^src/piolib/.*$"
+
 ci:
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"

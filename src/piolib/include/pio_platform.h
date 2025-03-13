@@ -25,27 +25,17 @@
 #define PARAM_ASSERTIONS_DISABLE_ALL 0
 #endif
 
-#define PARAM_ASSERTIONS_ENABLED(x)                                            \
-    ((PARAM_ASSERTIONS_ENABLED_##x || PARAM_ASSERTIONS_ENABLE_ALL) &&          \
-     !PARAM_ASSERTIONS_DISABLE_ALL)
-#define invalid_params_if(x, test)                                             \
-    ({                                                                         \
-        if (PARAM_ASSERTIONS_ENABLED(x))                                       \
-            assert(!(test));                                                   \
-    })
-#define valid_params_if(x, test)                                               \
-    ({                                                                         \
-        if (PARAM_ASSERTIONS_ENABLED(x))                                       \
-            assert(test);                                                      \
-    })
+#define PARAM_ASSERTIONS_ENABLED(x) ((PARAM_ASSERTIONS_ENABLED_ ## x || PARAM_ASSERTIONS_ENABLE_ALL) && !PARAM_ASSERTIONS_DISABLE_ALL)
+#define invalid_params_if(x, test) ({if (PARAM_ASSERTIONS_ENABLED(x)) assert(!(test));})
+#define valid_params_if(x, test) ({if (PARAM_ASSERTIONS_ENABLED(x)) assert(test);})
 
 #define STATIC_ASSERT(cond) static_assert(cond, #cond)
 
 #define _u(x) ((uint)(x))
-#define bool_to_bit(x) ((uint) !!(x))
+#define bool_to_bit(x) ((uint)!!(x))
 
 #ifndef count_of
-#define count_of(a) (sizeof(a) / sizeof((a)[0]))
+#define count_of(a) (sizeof(a)/sizeof((a)[0]))
 #endif
 
 typedef unsigned int uint;
