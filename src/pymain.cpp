@@ -166,9 +166,11 @@ The number of pixels in the shift register is automatically computed from these 
 layout. Decreasing ``n_planes`` can increase FPS at the cost of reduced color fidelity.
 The default, 10, is the maximum value.
 
-``n_temporal_planes`` controls temporal dithering of the panel. The acceptable values
-are 0 (the default), 2, and 4. A higher setting can increase FPS at the cost of
-slightly increasing the variation of brightness across subsequent frames.
+``n_temporal_planes`` controls temporal dithering of the panel.
+0 or 1 behave the same: All `n_planes` are transmitted every time.
+A higher value sets the number of planes that are only transmitted every `1/n_temporal_frames` times.
+A higher setting can increase FPS at the cost of slightly increasing the variation of brightness across subsequent frames.
+Settings above 4 are allowed, but generally do not give good results.
 
 For simple panels with just 1 connector (2 color lanes), the following constructor arguments are available:
 
