@@ -12,6 +12,42 @@
 
 namespace piomatter {
 
+static int pio_sm_xfer_data_large(PIO pio, int sm, int direction, size_t size,
+                                  uint32_t *databuf) {
+#if 0
+    // it would be NICE to gracefully fall back to blocked transfer, but sadly
+    // once the large xfer ioctl fails, future small xfers fail too.
+    static enum { UNKNOWN, OK, BAD } large_xfer_status = UNKNOWN;
+    printf("large_xfer_status=%d\n", large_xfer_status);
+    if (large_xfer_status != BAD) {
+        int r = pio_sm_xfer_data(pio, sm, direction, size, databuf);
+        if (large_xfer_status == UNKNOWN && r != 0) {
+            large_xfer_status = BAD;
+            fprintf(stderr,
+                    "Transmission limit workaround engaged. May reduce quality of "
+                    "output.\nSee https://github.com/raspberrypi/utils/issues/123 "
+                    "for details.\n");
+        } else {
+            if (large_xfer_status == UNKNOWN && r == 0) {
+                large_xfer_status = OK;
+            }
+            return r;
+        }
+    }
+#endif
+    constexpr size_t MAX_XFER = 65532;
+    while (size) {
+        size_t xfersize = std::min(size_t{MAX_XFER}, size);
+        int r = pio_sm_xfer_data(pio, sm, direction, xfersize, databuf);
+        if (r != 0) {
+            return r;
+        }
+        size -= xfersize;
+        databuf += xfersize / sizeof(*databuf);
+    }
+    return 0;
+}
+
 static uint64_t monotonicns64() {
     struct timespec tp;
     clock_gettime(CLOCK_MONOTONIC, &tp);
@@ -26,7 +62,7 @@ struct piomatter_base {
     piomatter_base &operator=(const piomatter_base &) = delete;
 
     virtual ~piomatter_base() {}
-    virtual void show() = 0;
+    virtual int show() = 0;
 
     double fps;
 };
@@ -48,7 +84,11 @@ struct piomatter : piomatter_base {
         show();
     }
 
-    void show() override {
+    int show() override {
+        int err = pending_error_errno.exchange(0); // we're handling this error
+        if (err != 0) {
+            return err;
+        }
         int buffer_idx = manager.get_free_buffer();
         auto &bufseq = buffers[buffer_idx];
         bufseq.resize(geometry.schedules.size());
@@ -61,6 +101,7 @@ struct piomatter : piomatter_base {
             old_active_time = geometry.schedules[i].back().active_time;
         }
         manager.put_filled_buffer(buffer_idx);
+        return 0;
     }
 
     ~piomatter() {
@@ -174,7 +215,15 @@ struct piomatter : piomatter_base {
                 const auto &data = cur_buf[seq_idx];
                 auto datasize = sizeof(uint32_t) * data.size();
                 auto dataptr = const_cast<uint32_t *>(&data[0]);
-                pio_sm_xfer_data(pio, sm, PIO_DIR_TO_SM, datasize, dataptr);
+                // returns err = rp1_ioctl.... which seems to be a negative
+                // errno value
+                int r = pio_sm_xfer_data_large(pio, sm, PIO_DIR_TO_SM, datasize,
+                                               dataptr);
+                if (r != 0) {
+                    pending_error_errno.store(errno);
+                    printf("xfer_data() returned error %d (errno=%s)\n", r,
+                           strerror(errno));
+                }
                 t1 = monotonicns64();
                 if (t0 != t1) {
                     fps = 1e9 / (t1 - t0);
@@ -194,6 +243,7 @@ struct piomatter : piomatter_base {
     matrix_geometry geometry;
     colorspace converter;
     std::thread blitter_thread;
+    std::atomic<int> pending_error_errno;
 };
 
 } // namespace piomatter

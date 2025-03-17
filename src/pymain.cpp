@@ -18,7 +18,14 @@ struct PyPiomatter {
     py::buffer buffer;
     std::unique_ptr<piomatter::piomatter_base> matter;
 
-    void show() { matter->show(); }
+    void show() {
+        int err = matter->show();
+        if (err != 0) {
+            errno = err;
+            PyErr_SetFromErrno(PyExc_OSError);
+            throw py::error_already_set();
+        }
+    }
     double fps() const { return matter->fps; }
 };
 
