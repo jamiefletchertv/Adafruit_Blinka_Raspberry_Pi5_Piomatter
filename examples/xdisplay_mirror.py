@@ -52,7 +52,7 @@ def main(width, height, serpentine, rotation, pinout, n_planes,
                                       n_temporal_planes=n_temporal_planes, n_lanes=n_lanes, map=pixelmap)
     else:
         geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines,
-                                      n_temporal_planes=n_temporal_planes, rotation=rotation)
+                                      n_temporal_planes=n_temporal_planes, rotation=rotation, serpentine=serpentine)
 
     framebuffer = np.zeros(shape=(geometry.height, geometry.width, 3), dtype=np.uint8)
     matrix = piomatter.PioMatter(colorspace=piomatter.Colorspace.RGB888Packed, pinout=pinout, framebuffer=framebuffer,
