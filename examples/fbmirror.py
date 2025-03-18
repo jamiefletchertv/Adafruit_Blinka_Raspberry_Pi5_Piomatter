@@ -44,7 +44,7 @@ def main(xoffset, yoffset, width, height, serpentine, rotation, pinout, n_planes
         pixelmap = simple_multilane_mapper(width, height, n_addr_lines, n_lanes)
         geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines, n_temporal_planes=n_temporal_planes, n_lanes=n_lanes, map=pixelmap)
     else:
-        geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines, n_temporal_planes=n_temporal_planes, rotation=rotation)
+        geometry = piomatter.Geometry(width=width, height=height, n_planes=n_planes, n_addr_lines=n_addr_lines, n_temporal_planes=n_temporal_planes, rotation=rotation, serpentine=serpentine)
     framebuffer = np.zeros(shape=(geometry.height, geometry.width), dtype=dtype)
     matrix = piomatter.PioMatter(colorspace=piomatter.Colorspace.RGB565, pinout=pinout, framebuffer=framebuffer, geometry=geometry)
 
