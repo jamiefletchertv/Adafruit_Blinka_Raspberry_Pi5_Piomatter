@@ -18,6 +18,7 @@ server_fixed.log
 
 # Test artifacts
 test_*.png
+test_new_features.py
 
 # Temporary files
 .DS_Store

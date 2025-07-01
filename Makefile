@@ -18,7 +18,7 @@ TEST_DIR = tests
 VENV_DIR = venv
 
 # Targets
-.PHONY: all build clean test deploy install-deps run-server run-client animate-logo integration-test help test-setup status perf-test build-websocket test-10s test-png test-colors
+.PHONY: all build clean test deploy install-deps run-server run-client animate-logo integration-test help test-setup status perf-test build-websocket test-10s test-png test-colors test-smpte test-animated-logo test-new-features test-video
 
 # Default target
 all: install-deps build test
@@ -41,6 +41,10 @@ help:
 	@echo "  make integration-test - Run full integration tests"
 	@echo "  make perf-test        - Run performance tests"
 	@echo "  make test-10s         - Run 10-second test with server and client"
+	@echo "  make test-smpte       - Test SMPTE color bars patterns"
+	@echo "  make test-animated-logo - Test animated PsyberCell logo effects"
+	@echo "  make test-new-features - Test both new features comprehensively"
+	@echo "  make test-video       - Test Big Buck Bunny video playback"
 	@echo "  make deploy           - Deploy to Raspberry Pi (set PI_HOST env var)"
 	@echo ""
 	@echo "Environment Variables:"
@@ -137,10 +141,10 @@ $(TEST_DIR):
 # Test setup and dependencies
 test-setup: install-python-deps
 	@echo "Testing virtual environment setup..."
-	@. $(VENV_DIR)/bin/activate && $(PYTHON) test_setup.py
+	@. $(VENV_DIR)/bin/activate && $(PYTHON) tests/test_setup.py
 
 # Unit tests
-test: test-setup unit-test integration-test
+test: test-setup unit-test integration-test test-new-features
 
 unit-test: build $(TEST_DIR)
 	@echo "Running unit tests..."
@@ -310,3 +314,91 @@ test-colors: build
 		killall -9 simple_server 2>/dev/null || true; \
 	fi
 	@echo "Color test complete!"
+
+# Test SMPTE color bars patterns
+test-smpte: build
+	@echo "Testing SMPTE color bars patterns..."
+	@echo "Cleaning any existing processes..."
+	@sudo killall -9 simple_server 2>/dev/null || true
+	@sleep 1
+	@if [ -e "/dev/pio0" ]; then \
+		echo "Starting Pi 5 server..."; \
+		sudo $(BUILD_DIR)/simple_server $(SERVER_PORT) & \
+		sleep 3; \
+		echo "Testing SMPTE patterns..."; \
+		. $(VENV_DIR)/bin/activate && timeout 20 $(PYTHON) examples/smpte_bars.py --host $(HOST) --port $(SERVER_PORT) || true; \
+		echo "Stopping server..."; \
+		sudo killall -9 simple_server 2>/dev/null || true; \
+	else \
+		echo "Starting test server..."; \
+		$(BUILD_DIR)/simple_server $(SERVER_PORT) & \
+		sleep 3; \
+		echo "Testing SMPTE patterns..."; \
+		. $(VENV_DIR)/bin/activate && timeout 20 $(PYTHON) examples/smpte_bars.py --host $(HOST) --port $(SERVER_PORT) || true; \
+		echo "Stopping server..."; \
+		killall -9 simple_server 2>/dev/null || true; \
+	fi
+	@echo "SMPTE test complete!"
+
+# Test animated PsyberCell logo effects  
+test-animated-logo: build
+	@echo "Testing animated PsyberCell logo effects..."
+	@echo "Cleaning any existing processes..."
+	@sudo killall -9 simple_server 2>/dev/null || true
+	@sleep 1
+	@if [ -e "/dev/pio0" ]; then \
+		echo "Starting Pi 5 server..."; \
+		sudo $(BUILD_DIR)/simple_server $(SERVER_PORT) & \
+		sleep 3; \
+		echo "Testing animated logo..."; \
+		. $(VENV_DIR)/bin/activate && timeout 30 $(PYTHON) examples/animate_psybercell_logo.py || true; \
+		echo "Stopping server..."; \
+		sudo killall -9 simple_server 2>/dev/null || true; \
+	else \
+		echo "Starting test server..."; \
+		$(BUILD_DIR)/simple_server $(SERVER_PORT) & \
+		sleep 3; \
+		echo "Testing animated logo..."; \
+		. $(VENV_DIR)/bin/activate && timeout 30 $(PYTHON) examples/animate_psybercell_logo.py || true; \
+		echo "Stopping server..."; \
+		killall -9 simple_server 2>/dev/null || true; \
+	fi
+	@echo "Animated logo test complete!"
+
+# Test both new features comprehensively
+test-new-features: build
+	@echo "Testing both new features comprehensively..."
+	@. $(VENV_DIR)/bin/activate && $(PYTHON) tests/test_new_features.py
+
+# Test Big Buck Bunny video playback
+test-video:
+	@echo "Testing Big Buck Bunny video playback..."
+	@if [ ! -f "$(BUILD_DIR)/simple_server" ]; then \
+		echo "Error: Server not built. Run 'make build' first."; \
+		exit 1; \
+	fi
+	@if [ ! -f "big-buck-bunny_600k.mp4" ]; then \
+		echo "Error: Video file not found: big-buck-bunny_600k.mp4"; \
+		exit 1; \
+	fi
+	@echo "Cleaning any existing processes..."
+	@sudo killall -9 simple_server 2>/dev/null || true
+	@sleep 1
+	@if [ -e "/dev/pio0" ]; then \
+		echo "Starting Pi 5 server..."; \
+		sudo $(BUILD_DIR)/simple_server $(SERVER_PORT) & \
+		sleep 3; \
+		echo "Testing video playback (60 seconds)..."; \
+		. $(VENV_DIR)/bin/activate && timeout 60 $(PYTHON) tests/test_video_playback.py || true; \
+		echo "Stopping server..."; \
+		sudo killall -9 simple_server 2>/dev/null || true; \
+	else \
+		echo "Starting test server..."; \
+		$(BUILD_DIR)/simple_server $(SERVER_PORT) & \
+		sleep 3; \
+		echo "Testing video playback (30 seconds)..."; \
+		. $(VENV_DIR)/bin/activate && timeout 30 $(PYTHON) tests/test_video_playback.py || true; \
+		echo "Stopping server..."; \
+		killall -9 simple_server 2>/dev/null || true; \
+	fi
+	@echo "Video test complete!"
