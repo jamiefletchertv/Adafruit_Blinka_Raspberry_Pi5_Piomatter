@@ -44,7 +44,8 @@ help:
 	@echo "  make test-smpte       - Test SMPTE color bars patterns"
 	@echo "  make test-animated-logo - Test animated PsyberCell logo effects"
 	@echo "  make test-new-features - Test both new features comprehensively"
-	@echo "  make test-video       - Test Big Buck Bunny video playback"
+	@echo "  make test-video       - Test Big Buck Bunny video playback (Pi 5 only)"
+	@echo "  make test-video-client - Test video client on macOS (connect to remote Pi 5)"
 	@echo "  make deploy           - Deploy to Raspberry Pi (set PI_HOST env var)"
 	@echo ""
 	@echo "Environment Variables:"
@@ -402,3 +403,13 @@ test-video:
 		killall -9 simple_server 2>/dev/null || true; \
 	fi
 	@echo "Video test complete!"
+
+# Test video client on macOS (no server build required)
+test-video-client:
+	@echo "Testing video client on macOS..."
+	@if [ ! -f "big-buck-bunny_600k.mp4" ]; then \
+		echo "Error: Video file not found: big-buck-bunny_600k.mp4"; \
+		exit 1; \
+	fi
+	@echo "Starting video client for remote server..."
+	@. $(VENV_DIR)/bin/activate && $(PYTHON) test_video_client_macos.py --host $(HOST) --port $(SERVER_PORT)
