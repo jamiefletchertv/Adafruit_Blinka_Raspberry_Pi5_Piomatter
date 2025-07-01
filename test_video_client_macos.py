@@ -30,8 +30,20 @@ def play_video_to_remote_server(video_path, host, port):
         # Connect to TCP server
         print(f"🔗 Connecting to server at {host}:{port}...")
         client = SimpleVideoStreamClient(host, port)
-        client.connect()
-        print(f"✅ Connected to matrix: {client.matrix_width}x{client.matrix_height}")
+        
+        # Add connection timeout
+        import socket
+        try:
+            client.connect()
+            print(f"✅ Connected to matrix: {client.matrix_width}x{client.matrix_height}")
+        except socket.timeout:
+            print("❌ Connection timed out - server may not be responding")
+            print("💡 Check if the server is running: 'sudo ./src/build_simple/simple_server 9002'")
+            return False
+        except ConnectionRefusedError:
+            print("❌ Connection refused - server not running")
+            print("💡 Start the server first: 'sudo ./src/build_simple/simple_server 9002'")
+            return False
         
         # Open video file
         cap = cv2.VideoCapture(video_path)

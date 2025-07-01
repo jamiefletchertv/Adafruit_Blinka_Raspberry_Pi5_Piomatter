@@ -413,3 +413,45 @@ test-video-client:
 	fi
 	@echo "Starting video client for remote server..."
 	@. $(VENV_DIR)/bin/activate && $(PYTHON) test_video_client_macos.py --host $(HOST) --port $(SERVER_PORT)
+
+# Test patterns client on macOS (no server build required)
+test-patterns-client:
+	@echo "Testing patterns client on macOS..."
+	@echo "Starting test patterns client for remote server..."
+	@. $(VENV_DIR)/bin/activate && $(PYTHON) test_patterns_client_macos.py --host $(HOST) --port $(SERVER_PORT)
+
+# Test SMPTE bars client on macOS (no server build required)
+test-smpte-client:
+	@echo "Testing SMPTE bars client on macOS..."
+	@echo "Starting SMPTE client for remote server..."
+	@. $(VENV_DIR)/bin/activate && $(PYTHON) smpte_bars_client_macos.py --host $(HOST) --port $(SERVER_PORT)
+
+# Test animated logo client on macOS (no server build required)
+test-logo-client:
+	@echo "Testing animated logo client on macOS..."
+	@echo "Starting logo animation client for remote server..."
+	@. $(VENV_DIR)/bin/activate && $(PYTHON) animated_logo_client_macos.py --host $(HOST) --port $(SERVER_PORT)
+
+# Run all macOS client tests
+test-all-clients: test-patterns-client test-smpte-client test-logo-client test-video-client
+
+# Server management targets
+server-start:
+	@echo "Starting RGB matrix server..."
+	@./server_manager.sh start $(SERVER_PORT)
+
+server-stop:
+	@echo "Stopping RGB matrix server..."
+	@./server_manager.sh stop $(SERVER_PORT)
+
+server-restart:
+	@echo "Restarting RGB matrix server..."
+	@./server_manager.sh restart $(SERVER_PORT)
+
+server-status:
+	@echo "Checking RGB matrix server status..."
+	@./server_manager.sh status $(SERVER_PORT)
+
+server-kill:
+	@echo "Force killing RGB matrix server..."
+	@./server_manager.sh kill $(SERVER_PORT)

@@ -28,6 +28,7 @@ class SimpleVideoStreamClient:
         """Connect to the TCP server and get matrix dimensions"""
         print(f"Connecting to {self.host}:{self.port}...")
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.settimeout(10.0)  # 10 second timeout
         self.socket.connect((self.host, self.port))
         
         # Wait for matrix info
