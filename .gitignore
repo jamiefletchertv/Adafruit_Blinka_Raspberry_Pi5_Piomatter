@@ -1,3 +1,30 @@
-/*.pio.h
-/build
-*.egg-info
+# Build artifacts
+src/build_*/
+src/adafruit_blinka_raspberry_pi5_piomatter/_piomatter.cpython-*.so
+src/adafruit_blinka_raspberry_pi5_piomatter/__pycache__/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+
+# Logs
+*.log
+server.log
+server_fixed.log
+
+# Test artifacts
+test_*.png
+
+# Temporary files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build dependencies
+node_modules/

@@ -11,20 +11,20 @@ add_compile_options(-Wall -g3 -O2)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/protomatter.pio.h
-    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/assemble.py ${CMAKE_CURRENT_SOURCE_DIR}/protomatter.pio ${CMAKE_CURRENT_BINARY_DIR}/protomatter.pio.h
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/assemble.py ${CMAKE_CURRENT_SOURCE_DIR}/protomatter.pio
+    COMMAND ../../venv/bin/python ../assemble.py ../protomatter.pio ${CMAKE_CURRENT_BINARY_DIR}/protomatter.pio.h
+    DEPENDS ../assemble.py ../protomatter.pio
 )
 
 add_executable(websocket_server
-    websocket_server.cpp
-    piolib/piolib.c
-    piolib/pio_rp1.c
+    ../websocket_server.cpp
+    ../piolib/piolib.c
+    ../piolib/pio_rp1.c
     ${CMAKE_CURRENT_BINARY_DIR}/protomatter.pio.h
 )
 
 target_include_directories(websocket_server PRIVATE 
-    include 
-    piolib/include
+    ../include 
+    ../piolib/include
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 

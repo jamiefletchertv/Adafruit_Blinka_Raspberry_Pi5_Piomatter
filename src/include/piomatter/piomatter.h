@@ -165,7 +165,7 @@ struct piomatter : piomatter_base {
         // frequency is approximately the best sustainable clock with current
         // FW & kernel.
         constexpr double target_freq =
-            2700000 * 2; // 2.7MHz pixel clock, 2 PIO cycles per pixel
+            25000000 * 2; // 25MHz pixel clock, 2 PIO cycles per pixel (maximum speed for 400Hz+ refresh)
         double div = clock_get_hz(clk_sys) / target_freq;
         sm_config_set_clkdiv(&c, div);
         sm_config_set_out_pins(&c, 0, 28);
