@@ -70,18 +70,26 @@ matrix_map make_matrixmap(size_t width, size_t height, size_t n_addr_lines,
 
             if (serpentine && h_panels > 1) {
                 // Handle horizontal serpentine for 3x2 layout
-                // Layout: 3 ← 2 ← 1 ← Pi (top row, right to left)
-                //         4 → 5 → 6     (bottom row, left to right)
+                // Chain order: 1→2→3→4→5→6 (data flows this way)
+                // Physical layout: 3 ← 2 ← 1 ← Pi (top row)
+                //                  4 → 5 → 6     (bottom row)
                 
                 int panel_x = panel_idx / panel_width;  // Which panel horizontally (0, 1, 2)
                 int pixel_in_panel = panel_idx % panel_width;  // Pixel within panel
                 int panel_y = panel_no;  // Which row (0 = top, 1 = bottom)
                 
                 if (panel_y == 0) {
-                    // Top row: reverse order (3 ← 2 ← 1)
-                    x = (h_panels - 1 - panel_x) * panel_width + (panel_width - 1 - pixel_in_panel);
+                    // Top row: data chain 1→2→3 maps to physical positions right←left
+                    // Chain panel 1 (panel_x=0) goes to physical position 2 (rightmost)
+                    // Chain panel 2 (panel_x=1) goes to physical position 1 (middle)  
+                    // Chain panel 3 (panel_x=2) goes to physical position 0 (leftmost)
+                    int physical_x = (h_panels - 1 - panel_x);
+                    x = physical_x * panel_width + pixel_in_panel;
                 } else {
-                    // Bottom row: normal order (4 → 5 → 6)
+                    // Bottom row: data chain 4→5→6 maps to physical positions left→right
+                    // Chain panel 4 (panel_x=0) goes to physical position 0 (leftmost)
+                    // Chain panel 5 (panel_x=1) goes to physical position 1 (middle)
+                    // Chain panel 6 (panel_x=2) goes to physical position 2 (rightmost)
                     x = panel_x * panel_width + pixel_in_panel;
                 }
                 
