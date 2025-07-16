@@ -57,7 +57,7 @@ public:
             width,  // tile_width (192)
             height, // tile_height (64)
             false,  // serpentine disabled - independent rows
-            piomatter::orientation_normal
+            piomatter::orientation_r180
         );
         
         // Create the matrix object - use standard Adafruit pinout for correct colors
