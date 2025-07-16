@@ -47,8 +47,9 @@ private:
     
 public:
     SimpleTcpServer() : framebuffer_(width * height, 0), server_fd_(-1) {
-        // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) - independent rows
-        // Physical layout: [3][2][1] top row, [4][5][6] bottom row - no serpentine
+        // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) - serpentine layout
+        // Physical layout: [3][2][1] top row, [6][5][4] bottom row (serpentine)
+        // Data flow: 1→2→3→6→5→4
         piomatter::matrix_geometry geometry(
             192,    // pixels_across (3 panels x 64 wide)
             5,      // row_select_lines (64-pixel height = 2^6, so 5 address lines)
@@ -56,8 +57,8 @@ public:
             2,      // temporal dither for even more speed
             width,  // tile_width (192)
             height, // tile_height (64)
-            false,  // serpentine disabled - independent rows
-            piomatter::orientation_r180
+            true,   // serpentine enabled for proper zigzag layout
+            piomatter::orientation_normal
         );
         
         // Create the matrix object - use standard Adafruit pinout for correct colors
