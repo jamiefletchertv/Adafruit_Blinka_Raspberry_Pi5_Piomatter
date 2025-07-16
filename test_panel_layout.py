@@ -169,9 +169,9 @@ def main():
     args = parser.parse_args()
     
     # Connect to server
-    client = SimpleVideoStreamClient()
+    client = SimpleVideoStreamClient(args.host, args.port)
     try:
-        client.connect(args.host, args.port)
+        client.connect()
         print(f"✅ Connected to matrix: {client.matrix_width}x{client.matrix_height}")
         
         print(f"📐 Expected layout:")
@@ -231,7 +231,8 @@ def main():
         print(f"❌ Error: {e}")
     finally:
         # Clear display
-        client.send_frame(np.zeros((client.matrix_height, client.matrix_width, 3), dtype=np.uint8))
+        if client.matrix_height and client.matrix_width:
+            client.send_frame(np.zeros((client.matrix_height, client.matrix_width, 3), dtype=np.uint8))
         client.disconnect()
 
 if __name__ == "__main__":

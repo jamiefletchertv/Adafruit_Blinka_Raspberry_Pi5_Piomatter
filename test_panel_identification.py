@@ -115,9 +115,9 @@ def main():
     args = parser.parse_args()
     
     # Connect to server
-    client = SimpleVideoStreamClient()
+    client = SimpleVideoStreamClient(args.host, args.port)
     try:
-        client.connect(args.host, args.port)
+        client.connect()
         print(f"✅ Connected to matrix: {client.matrix_width}x{client.matrix_height}")
         
         if args.mode == 'all':
