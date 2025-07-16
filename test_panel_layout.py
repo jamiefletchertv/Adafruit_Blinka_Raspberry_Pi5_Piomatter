@@ -202,6 +202,7 @@ def main():
             for panel_num in range(1, 7):
                 print(f"Panel {panel_num} (physical position)")
                 frame = np.zeros((client.matrix_height, client.matrix_width, 3), dtype=np.uint8)
+                print(f"Matrix dimensions: {client.matrix_width}x{client.matrix_height}")
                 
                 # Physical positions
                 physical_positions = {

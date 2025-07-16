@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: Adafruit-Blinka-Raspberry-Pi5-Piomatter
-Version: 1.0.0a11.dev0+g792955c.d20250701
+Version: 0.1.dev169+g0ac198d.d20250716
 Summary: HUB75 matrix driver for Raspberry Pi 5 using PIO
 Home-page: https://github.com/adafruit/Adafruit_Blinka_Raspberry_Pi5_Piomatter
 Requires-Python: >=3.11

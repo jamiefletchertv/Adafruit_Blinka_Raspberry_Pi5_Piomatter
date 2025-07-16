@@ -58,13 +58,37 @@ matrix_map make_matrixmap(size_t width, size_t height, size_t n_addr_lines,
     matrix_map result;
     result.reserve(width * height);
 
+    // Calculate panel dimensions for horizontal serpentine
+    size_t panel_width = 64;  // Standard panel width
+    size_t h_panels = width / panel_width;  // Number of panels horizontally
+    
     for (size_t i = 0; i < half_panel_height; i++) {
         for (size_t j = 0; j < pixels_across; j++) {
             int panel_no = j / width;
             int panel_idx = j % width;
             int x, y0, y1;
 
-            if (serpentine && panel_no % 2) {
+            if (serpentine && h_panels > 1) {
+                // Handle horizontal serpentine for 3x2 layout
+                // Layout: 3 ← 2 ← 1 ← Pi (top row, right to left)
+                //         4 → 5 → 6     (bottom row, left to right)
+                
+                int panel_x = panel_idx / panel_width;  // Which panel horizontally (0, 1, 2)
+                int pixel_in_panel = panel_idx % panel_width;  // Pixel within panel
+                int panel_y = panel_no;  // Which row (0 = top, 1 = bottom)
+                
+                if (panel_y == 0) {
+                    // Top row: reverse order (3 ← 2 ← 1)
+                    x = (h_panels - 1 - panel_x) * panel_width + (panel_width - 1 - pixel_in_panel);
+                } else {
+                    // Bottom row: normal order (4 → 5 → 6)
+                    x = panel_x * panel_width + pixel_in_panel;
+                }
+                
+                y0 = panel_no * panel_height + i;
+                y1 = panel_no * panel_height + i + half_panel_height;
+            } else if (serpentine && panel_no % 2) {
+                // Original vertical serpentine for backward compatibility
                 x = width - panel_idx - 1;
                 y0 = (panel_no + 1) * panel_height - i - 1;
                 y1 = (panel_no + 1) * panel_height - i - half_panel_height - 1;

@@ -104,7 +104,10 @@ def main():
         width=192,
         height=64,
         n_addr_lines=4,  # For 64x32 panels
-        rotation=piomatter.Orientation.Normal
+        n_planes=10,
+        n_temporal_planes=0,
+        rotation=piomatter.Orientation.Normal,
+        serpentine=True
     )
     
     # Create test pattern
