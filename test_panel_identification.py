@@ -6,7 +6,7 @@ Panel identification test - displays panel numbers to identify correct ordering
 import numpy as np
 import time
 from PIL import Image, ImageDraw, ImageFont
-from simple_tcp_client import SimpleTcpClient
+from simple_tcp_client import SimpleVideoStreamClient
 import argparse
 
 def create_panel_test_pattern(width, height, panel_width=64, panel_height=32):
@@ -115,7 +115,7 @@ def main():
     args = parser.parse_args()
     
     # Connect to server
-    client = SimpleTcpClient()
+    client = SimpleVideoStreamClient()
     try:
         client.connect(args.host, args.port)
         print(f"✅ Connected to matrix: {client.matrix_width}x{client.matrix_height}")
