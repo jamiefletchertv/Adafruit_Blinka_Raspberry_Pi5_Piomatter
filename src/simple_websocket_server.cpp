@@ -47,8 +47,8 @@ private:
     
 public:
     SimpleTcpServer() : framebuffer_(width * height, 0), server_fd_(-1) {
-        // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) in serpentine layout
-        // Aggressively optimized for 300-400Hz refresh rate
+        // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) - independent rows
+        // Physical layout: [3][2][1] top row, [4][5][6] bottom row - no serpentine
         piomatter::matrix_geometry geometry(
             192,    // pixels_across (3 panels x 64 wide)
             5,      // row_select_lines (64-pixel height = 2^6, so 5 address lines)
@@ -56,7 +56,7 @@ public:
             2,      // temporal dither for even more speed
             width,  // tile_width (192)
             height, // tile_height (64)
-            true,   // serpentine enabled for zigzag panel layout
+            false,  // serpentine disabled - independent rows
             piomatter::orientation_normal
         );
         
