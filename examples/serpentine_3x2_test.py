@@ -107,7 +107,7 @@ def main():
         n_planes=10,
         n_temporal_planes=0,
         rotation=piomatter.Orientation.Normal,
-        serpentine=False  # Test without serpentine first
+        serpentine=True  # Test with serpentine
     )
     
     # Create test pattern

@@ -78,20 +78,22 @@ matrix_map make_matrixmap(size_t width, size_t height, size_t n_addr_lines,
                 int pixel_in_panel = panel_idx % panel_width;  // Pixel within panel
                 int panel_y = panel_no;  // Which row (0 = top, 1 = bottom)
                 
-                // Simple fix: if seeing top(4,5,6) bottom(1,2,3), just swap the rows
+                // Without serpentine: top(4,5,6) bottom(1,2,3 upside down)
+                // With serpentine: want top(3,2,1) bottom(4,5,6)
+                
                 if (panel_no == 0) {
-                    // Top row currently shows 4,5,6, but we want 3,2,1
-                    // So map: panel_x 0→2, 1→1, 2→0 (reverse) and add 3 offset
-                    int physical_x = (h_panels - 1 - panel_x);
+                    // Top row: chain 1,2,3 → want physical 3,2,1
+                    // Swap rows: top row data goes to bottom
+                    int physical_x = (h_panels - 1 - panel_x);  // Reverse order
                     x = physical_x * panel_width + pixel_in_panel;
-                    y0 = 1 * panel_height + i;  // Move to bottom row
+                    y0 = 1 * panel_height + i;  // Bottom row
                     y1 = 1 * panel_height + i + half_panel_height;
                 } else {
-                    // Bottom row currently shows 1,2,3, but we want 4,5,6  
-                    // So map: panel_x 0→2, 1→1, 2→0 (reverse) and subtract 3 offset
-                    int physical_x = (h_panels - 1 - panel_x);
-                    x = physical_x * panel_width + pixel_in_panel;
-                    y0 = 0 * panel_height + i;  // Move to top row
+                    // Bottom row: chain 4,5,6 → want physical 4,5,6 
+                    // Swap rows: bottom row data goes to top
+                    // Also need to flip pixels since bottom row is upside down
+                    x = panel_x * panel_width + (panel_width - 1 - pixel_in_panel);
+                    y0 = 0 * panel_height + i;  // Top row
                     y1 = 0 * panel_height + i + half_panel_height;
                 }
             } else if (serpentine && panel_no % 2) {
