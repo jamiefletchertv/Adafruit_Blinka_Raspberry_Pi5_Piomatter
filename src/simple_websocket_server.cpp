@@ -50,6 +50,7 @@ public:
         // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) - standard serpentine
         // Physical layout: [1][2][3] top row, [4][5][6] bottom row
         // Data flow: 1→2→3→4→5→6 (standard serpentine pattern)
+        auto matrix_map = piomatter::make_matrixmap(width, height, 4, true, piomatter::orientation_normal);
         piomatter::matrix_geometry geometry(
             192,    // pixels_across (3 panels x 64 wide)
             4,      // row_select_lines (32-pixel height = 2^4, so 4 address lines)
@@ -57,8 +58,8 @@ public:
             0,      // temporal dither (disabled initially)
             width,  // tile_width (192)
             height, // tile_height (64)
-            true,   // serpentine enabled (standard Adafruit pattern)
-            piomatter::orientation_normal
+            matrix_map,
+            4       // n_lanes (height / (1 << n_addr_lines) = 64 / 16 = 4)
         );
         
         // Create the matrix object - use standard Adafruit pinout for correct colors
