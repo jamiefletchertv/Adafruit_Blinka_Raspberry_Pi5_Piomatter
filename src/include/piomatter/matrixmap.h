@@ -78,22 +78,22 @@ matrix_map make_matrixmap(size_t width, size_t height, size_t n_addr_lines,
                 int pixel_in_panel = panel_idx % panel_width;  // Pixel within panel
                 int panel_y = panel_no;  // Which row (0 = top, 1 = bottom)
                 
-                // Swap rows: top row becomes bottom row and vice versa
-                int swapped_panel_y = 1 - panel_y;
+                // Fix chain offset: currently showing 4,5,6,1,2,3 but need 1,2,3,4,5,6
+                // Add 3 to chain position to correct the offset
+                int corrected_panel_no = (panel_no + 1) % 2; // This maps 0→1, 1→0 to swap rows
+                int corrected_panel_x = panel_x;
                 
-                if (panel_y == 0) {
-                    // Top row: data chain 1→2→3 maps to physical positions 3←2←1 (right to left)
-                    // Reverse pixel order within each panel since panels face forward
-                    int physical_x = (h_panels - 1 - panel_x);
-                    x = physical_x * panel_width + (panel_width - 1 - pixel_in_panel);
+                if (corrected_panel_no == 0) {
+                    // Top row: panels 1,2,3 → physical positions 3,2,1 (right to left)
+                    int physical_x = (h_panels - 1 - corrected_panel_x);
+                    x = physical_x * panel_width + pixel_in_panel;
                 } else {
-                    // Bottom row: data chain 4→5→6 maps to physical positions 4→5→6 (left to right)
-                    // Reverse pixel order within each panel since panels face forward  
-                    x = panel_x * panel_width + (panel_width - 1 - pixel_in_panel);
+                    // Bottom row: panels 4,5,6 → physical positions 4,5,6 (left to right)
+                    x = corrected_panel_x * panel_width + pixel_in_panel;
                 }
                 
-                y0 = swapped_panel_y * panel_height + i;
-                y1 = swapped_panel_y * panel_height + i + half_panel_height;
+                y0 = corrected_panel_no * panel_height + i;
+                y1 = corrected_panel_no * panel_height + i + half_panel_height;
             } else if (serpentine && panel_no % 2) {
                 // Original vertical serpentine for backward compatibility
                 x = width - panel_idx - 1;
