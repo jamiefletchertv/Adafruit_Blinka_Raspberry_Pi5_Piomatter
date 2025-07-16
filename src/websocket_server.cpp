@@ -35,7 +35,7 @@ static void InterruptHandler(int signo) {
 
 class PiomatterWebSocketServer {
 private:
-    static constexpr int width = 64;
+    static constexpr int width = 192;
     static constexpr int height = 64;
     
     server ws_server_;
@@ -49,15 +49,15 @@ private:
     
 public:
     PiomatterWebSocketServer() : framebuffer_(width * height, 0) {
-        // Initialize the Piomatter matrix
+        // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) in serpentine layout
         piomatter::matrix_geometry geometry(
-            128,    // pixels_across
-            4,      // row_select_lines
+            192,    // pixels_across (3 panels x 64 wide)
+            5,      // row_select_lines (64-pixel height = 2^6, so 5 address lines)
             10,     // bit_depth  
             0,      // swizzle
-            width,  // tile_width
-            height, // tile_height
-            true,   // serpentine
+            width,  // tile_width (192)
+            height, // tile_height (64)
+            true,   // serpentine enabled for zigzag panel layout
             piomatter::orientation_normal
         );
         

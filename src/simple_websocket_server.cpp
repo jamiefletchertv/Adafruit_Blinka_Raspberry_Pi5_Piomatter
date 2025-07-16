@@ -31,8 +31,8 @@ static void InterruptHandler(int signo) {
 
 class SimpleTcpServer {
 private:
-    static constexpr int width = 128;  // 2x 64x32 panels chained horizontally
-    static constexpr int height = 32;
+    static constexpr int width = 192;  // 3x 64x64 panels chained horizontally
+    static constexpr int height = 64;
     
     int server_fd_;
     std::set<int> client_sockets_;
@@ -47,16 +47,16 @@ private:
     
 public:
     SimpleTcpServer() : framebuffer_(width * height, 0), server_fd_(-1) {
-        // Initialize the Piomatter matrix for 2x 64x32 panels (128x32 total)
+        // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) in serpentine layout
         // Aggressively optimized for 300-400Hz refresh rate
         piomatter::matrix_geometry geometry(
-            128,    // pixels_across (2 panels x 64 wide)
-            4,      // row_select_lines (32-pixel height = 2^5, so 4 address lines)
+            192,    // pixels_across (3 panels x 64 wide)
+            5,      // row_select_lines (64-pixel height = 2^6, so 5 address lines)
             5,      // bit_depth (reduced to 5 for maximum refresh speed - 32 color levels)  
             2,      // temporal dither for even more speed
-            width,  // tile_width (128)
-            height, // tile_height (32)
-            false,  // serpentine disabled for proper chaining
+            width,  // tile_width (192)
+            height, // tile_height (64)
+            true,   // serpentine enabled for zigzag panel layout
             piomatter::orientation_normal
         );
         
