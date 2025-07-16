@@ -48,7 +48,7 @@ def create_numbered_grid(width, height):
     return np.array(img)
 
 def create_logical_sequence_test(width, height):
-    """Test logical panel sequence 1-6"""
+    """Test logical panel sequence 1-6 with 3x2 serpentine"""
     frames = []
     
     # Create 6 frames, each lighting up one logical panel
@@ -56,20 +56,16 @@ def create_logical_sequence_test(width, height):
         frame = np.zeros((height, width, 3), dtype=np.uint8)
         
         # Calculate position based on logical panel number
-        # Logical sequence: 1→2→3→6→5→4 (serpentine)
+        # Expected 3x2 serpentine: 3 ← 2 ← 1 ← Pi
+        #                         4 → 5 → 6
         if logical_panel <= 3:
-            # Top row: panels 1, 2, 3
+            # Top row: panels 1, 2, 3 (right to left from Pi)
             py = 0
-            px = logical_panel - 1
+            px = 3 - logical_panel  # Panel 1 at pos 2, Panel 2 at pos 1, Panel 3 at pos 0
         else:
-            # Bottom row: panels 4, 5, 6 (but in reverse order for serpentine)
+            # Bottom row: panels 4, 5, 6 (left to right)
             py = 1
-            if logical_panel == 4:
-                px = 2  # Panel 4 is rightmost in bottom row
-            elif logical_panel == 5:
-                px = 1  # Panel 5 is middle in bottom row
-            elif logical_panel == 6:
-                px = 0  # Panel 6 is leftmost in bottom row
+            px = logical_panel - 4  # Panel 4 at pos 0, Panel 5 at pos 1, Panel 6 at pos 2
         
         # Light up the panel
         x = px * 64

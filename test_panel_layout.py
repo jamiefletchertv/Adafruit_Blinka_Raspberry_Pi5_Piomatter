@@ -112,14 +112,16 @@ def create_panel_test_with_corners(width, height, panel_width=64, panel_height=3
         6: (0, 255, 255),   # Cyan
     }
     
-    # Physical positions (where we expect panels to be)
+    # Physical positions for 3x2 serpentine (where we expect panels to be)
+    # Layout: 3 ← 2 ← 1 ← Pi
+    #         4 → 5 → 6
     physical_positions = {
-        1: (2, 0),  # Top-right
-        2: (1, 0),  # Top-middle
-        3: (0, 0),  # Top-left
-        4: (0, 1),  # Bottom-left
-        5: (1, 1),  # Bottom-middle
-        6: (2, 1),  # Bottom-right
+        1: (2, 0),  # Top-right (first from Pi)
+        2: (1, 0),  # Top-middle (second from Pi)
+        3: (0, 0),  # Top-left (third from Pi)
+        4: (0, 1),  # Bottom-left (fourth, serpentine continues)
+        5: (1, 1),  # Bottom-middle (fifth)
+        6: (2, 1),  # Bottom-right (sixth)
     }
     
     for panel_num, (px, py) in physical_positions.items():
