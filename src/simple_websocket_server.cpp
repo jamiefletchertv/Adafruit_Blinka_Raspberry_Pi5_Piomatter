@@ -23,6 +23,7 @@
 #include <sys/select.h>
 
 #include "piomatter/piomatter.h"
+#include "../custom_orientation.h"
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
@@ -57,8 +58,8 @@ public:
             2,      // temporal dither for even more speed
             width,  // tile_width (192)
             height, // tile_height (64)
-            true,   // serpentine enabled for proper zigzag layout
-            piomatter::orientation_normal
+            false,  // serpentine disabled - using custom mapping
+            custom_panel_orientation
         );
         
         // Create the matrix object - use standard Adafruit pinout for correct colors
