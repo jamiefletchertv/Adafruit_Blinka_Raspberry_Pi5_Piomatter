@@ -23,7 +23,6 @@
 #include <sys/select.h>
 
 #include "piomatter/piomatter.h"
-#include "../custom_orientation.h"
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
@@ -48,18 +47,18 @@ private:
     
 public:
     SimpleTcpServer() : framebuffer_(width * height, 0), server_fd_(-1) {
-        // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) - serpentine layout
-        // Physical layout: [3][2][1] top row, [6][5][4] bottom row (serpentine)
-        // Data flow: 1→2→3→6→5→4
+        // Initialize the Piomatter matrix for 3x2 64x32 panels (192x64 total) - standard serpentine
+        // Physical layout: [3][2][1] top row, [4][5][6] bottom row
+        // Data flow: 1→2→3→4→5→6 (standard serpentine pattern)
         piomatter::matrix_geometry geometry(
             192,    // pixels_across (3 panels x 64 wide)
             5,      // row_select_lines (64-pixel height = 2^6, so 5 address lines)
-            5,      // bit_depth (reduced to 5 for maximum refresh speed - 32 color levels)  
-            2,      // temporal dither for even more speed
+            10,     // bit_depth (full color depth)
+            0,      // temporal dither (disabled initially)
             width,  // tile_width (192)
             height, // tile_height (64)
-            false,  // serpentine disabled - using custom mapping
-            custom_panel_orientation
+            true,   // serpentine enabled (standard Adafruit pattern)
+            piomatter::orientation_normal
         );
         
         // Create the matrix object - use standard Adafruit pinout for correct colors
