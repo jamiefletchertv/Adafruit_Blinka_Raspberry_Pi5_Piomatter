@@ -91,10 +91,10 @@ matrix_map make_matrixmap(size_t width, size_t height, size_t n_addr_lines,
                 } else {
                     // Bottom row: chain 4,5,6 → want physical 4,5,6 
                     // Swap rows: bottom row data goes to top
-                    // Also need to flip pixels since bottom row is upside down
+                    // Fix upside down: flip both X and Y within panel
                     x = panel_x * panel_width + (panel_width - 1 - pixel_in_panel);
-                    y0 = 0 * panel_height + i;  // Top row
-                    y1 = 0 * panel_height + i + half_panel_height;
+                    y0 = 0 * panel_height + (half_panel_height - 1 - i);  // Top row, flipped Y
+                    y1 = 0 * panel_height + (panel_height - 1 - i);       // Top row, flipped Y
                 }
             } else if (serpentine && panel_no % 2) {
                 // Original vertical serpentine for backward compatibility
