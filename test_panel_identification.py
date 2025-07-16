@@ -107,8 +107,8 @@ def create_gradient_test(width, height):
 
 def main():
     parser = argparse.ArgumentParser(description='Test panel identification')
-    parser.add_argument('--host', default='raspberrypi.local', help='Server hostname/IP')
-    parser.add_argument('--port', type=int, default=9999, help='Server port')
+    parser.add_argument('--host', default='localhost', help='Server hostname/IP')
+    parser.add_argument('--port', type=int, default=9002, help='Server port')
     parser.add_argument('--mode', choices=['all', 'individual', 'gradient'], default='all',
                         help='Test mode')
     parser.add_argument('--panel', type=int, default=1, help='Panel number for individual mode')

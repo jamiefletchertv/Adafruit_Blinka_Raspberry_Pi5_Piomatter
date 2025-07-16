@@ -162,8 +162,8 @@ def create_panel_test_with_corners(width, height, panel_width=64, panel_height=3
 
 def main():
     parser = argparse.ArgumentParser(description='Test panel layout and orientation')
-    parser.add_argument('--host', default='raspberrypi.local', help='Server hostname/IP')
-    parser.add_argument('--port', type=int, default=9999, help='Server port')
+    parser.add_argument('--host', default='localhost', help='Server hostname/IP')
+    parser.add_argument('--port', type=int, default=9002, help='Server port')
     parser.add_argument('--test', choices=['arrows', 'coords', 'corners', 'sequence'], default='corners',
                         help='Test pattern type')
     args = parser.parse_args()
