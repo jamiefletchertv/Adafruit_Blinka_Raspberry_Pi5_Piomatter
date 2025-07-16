@@ -83,11 +83,13 @@ matrix_map make_matrixmap(size_t width, size_t height, size_t n_addr_lines,
                 
                 if (panel_y == 0) {
                     // Top row: data chain 1→2→3 maps to physical positions 3←2←1 (right to left)
+                    // Reverse pixel order within each panel since panels face forward
                     int physical_x = (h_panels - 1 - panel_x);
-                    x = physical_x * panel_width + pixel_in_panel;
+                    x = physical_x * panel_width + (panel_width - 1 - pixel_in_panel);
                 } else {
-                    // Bottom row: data chain 4→5→6 maps to physical positions 4→5→6 (left to right)  
-                    x = panel_x * panel_width + pixel_in_panel;
+                    // Bottom row: data chain 4→5→6 maps to physical positions 4→5→6 (left to right)
+                    // Reverse pixel order within each panel since panels face forward  
+                    x = panel_x * panel_width + (panel_width - 1 - pixel_in_panel);
                 }
                 
                 y0 = swapped_panel_y * panel_height + i;
