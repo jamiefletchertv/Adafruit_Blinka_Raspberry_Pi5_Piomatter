@@ -52,7 +52,7 @@ public:
         // Data flow: 1→2→3→4→5→6 (standard serpentine pattern)
         piomatter::matrix_geometry geometry(
             192,    // pixels_across (3 panels x 64 wide)
-            5,      // row_select_lines (64-pixel height = 2^6, so 5 address lines)
+            6,      // row_select_lines (64-pixel height = 2^6, so 6 address lines)
             10,     // bit_depth (full color depth)
             0,      // temporal dither (disabled initially)
             width,  // tile_width (192)
