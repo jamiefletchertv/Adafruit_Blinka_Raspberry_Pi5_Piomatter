@@ -2,9 +2,9 @@
 """
 Test 3x2 serpentine configuration for 6x 64x32 panels
 
-Expected layout:
-[3] ← [2] ← [1] ← Pi
-[4] → [5] → [6]
+Physical wiring:
+[1] → [2] → [3] (connected to Pi)
+[6] ← [5] ← [4]
 
 This creates a 192x64 display from 6 panels in serpentine configuration.
 """
@@ -36,19 +36,24 @@ def create_test_pattern(width, height):
     ]
     
     # Draw panels with numbers
+    # Corrected mapping to match actual front view
+    # Panel 1 = top-left, Panel 4 = bottom-right, Panel 6 = bottom-left
+    # Top row: 1, 2, 3 (left to right)
+    # Bottom row: 6, 5, 4 (left to right)
+    panel_positions = {
+        1: (0, 0),  # Top-left
+        2: (1, 0),  # Top-middle
+        3: (2, 0),  # Top-right
+        4: (2, 1),  # Bottom-right (serpentine continues from panel 3)
+        5: (1, 1),  # Bottom-middle
+        6: (0, 1),  # Bottom-left
+    }
+    
     for panel_num in range(1, 7):
-        # Calculate physical position
-        if panel_num <= 3:
-            # Top row: 3 ← 2 ← 1 (right to left from Pi)
-            px = 3 - panel_num  # Panel 1 at pos 2, Panel 2 at pos 1, Panel 3 at pos 0
-            py = 0
-        else:
-            # Bottom row: 4 → 5 → 6 (left to right)
-            px = panel_num - 4  # Panel 4 at pos 0, Panel 5 at pos 1, Panel 6 at pos 2
-            py = 1
+        px, py = panel_positions[panel_num]
         
         x = px * 64
-        y = py * 32
+        y = (1 - py) * 32  # Invert y-coordinate to swap rows
         color = panel_colors[panel_num - 1]
         
         # Fill panel with color
@@ -72,7 +77,7 @@ def create_test_pattern(width, height):
     # Draw arrows showing data flow
     arrow_color = (255, 255, 255)
     
-    # Top row arrows (right to left): 1 → 2 → 3
+    # Top row arrows (right to left): 1 ← 2 ← 3
     for i in range(2):
         x = (2 - i) * 64 - 10  # Between panels
         y = 16  # Middle of top row
@@ -80,8 +85,8 @@ def create_test_pattern(width, height):
         draw.polygon([(x - 10, y), (x - 5, y - 3), (x - 5, y + 3)], fill=arrow_color)
     
     # Vertical connection from panel 3 to panel 4
-    draw.line([(32, 32), (32, 40)], fill=arrow_color, width=2)
-    draw.polygon([(32, 40), (29, 35), (35, 35)], fill=arrow_color)
+    draw.line([(160, 32), (160, 40)], fill=arrow_color, width=2)
+    draw.polygon([(160, 40), (157, 35), (163, 35)], fill=arrow_color)
     
     # Bottom row arrows (left to right): 4 → 5 → 6
     for i in range(2):
@@ -94,9 +99,9 @@ def create_test_pattern(width, height):
 
 def main():
     print("🔧 Testing 3x2 serpentine configuration...")
-    print("Expected layout:")
-    print("   [3] ← [2] ← [1] ← Pi")
-    print("   [4] → [5] → [6]")
+    print("Physical wiring:")
+    print("   [1] → [2] → [3] (connected to Pi)")
+    print("   [6] ← [5] ← [4]")
     
     # Create geometry for 3x2 serpentine (192x64 total)
     # Each panel is 64x32, so 3 panels wide = 192, 2 panels tall = 64
@@ -107,7 +112,7 @@ def main():
         n_planes=10,
         n_temporal_planes=0,
         rotation=piomatter.Orientation.Normal,
-        serpentine=True  # Test with serpentine
+        serpentine=True  # Enable serpentine to match wiring
     )
     
     # Create test pattern
@@ -125,14 +130,14 @@ def main():
     matrix.show()
     
     print("🔍 Check your display:")
-    print("- Panel 1 (red) should be top-right")
-    print("- Panel 2 (green) should be top-middle")
-    print("- Panel 3 (blue) should be top-left")
-    print("- Panel 4 (yellow) should be bottom-left")
+    print("- Panel 1 (red) should be top-left")
+    print("- Panel 2 (green) should be top-middle") 
+    print("- Panel 3 (blue) should be top-right")
+    print("- Panel 4 (yellow) should be bottom-right")
     print("- Panel 5 (magenta) should be bottom-middle")
-    print("- Panel 6 (cyan) should be bottom-right")
+    print("- Panel 6 (cyan) should be bottom-left")
     print()
-    print("If panels are in wrong positions, the serpentine mapping needs adjustment.")
+    print("Corrected mapping: 1,2,3 (top), 6,5,4 (bottom)")
     
     input("Press Enter to exit...")
 
