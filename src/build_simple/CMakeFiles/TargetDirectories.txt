@@ -1,0 +1,3 @@
+/Users/jamie/repos/github-personal/Adafruit_Blinka_Raspberry_Pi5_Piomatter/src/build_simple/CMakeFiles/simple_server.dir
+/Users/jamie/repos/github-personal/Adafruit_Blinka_Raspberry_Pi5_Piomatter/src/build_simple/CMakeFiles/edit_cache.dir
+/Users/jamie/repos/github-personal/Adafruit_Blinka_Raspberry_Pi5_Piomatter/src/build_simple/CMakeFiles/rebuild_cache.dir
